@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lâmina virtual · protótipo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+    <style>
+      :root {
+        --fundo: #26232f;
+        --painel: #1b1922;
+        --borda: #ffffff1f;
+        --texto: #eceaf4;
+        --suave: #b9b4c9;
+        --destaque: #7a5cff;
+        --nota: #ffcf33;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: var(--fundo);
+        color: var(--texto);
+        font: 14px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+      }
+      body {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        grid-template-columns: 1fr 300px;
+        height: 100dvh;
+      }
+      header {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 14px;
+        background: var(--painel);
+        border-bottom: 1px solid var(--borda);
+      }
+      header h1 {
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        font-size: 15px;
+        font-weight: 650;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      header h1 small {
+        display: block;
+        color: var(--suave);
+        font-size: 12px;
+        font-weight: 400;
+      }
+      button {
+        font: inherit;
+        color: #fff;
+        background: #2d2a38;
+        border: 1px solid #ffffff38;
+        border-radius: 8px;
+        padding: 6px 11px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #3a3550;
+      }
+      button[aria-pressed='true'] {
+        background: var(--destaque);
+        border-color: var(--destaque);
+      }
+      #visor {
+        position: relative;
+        min-height: 0;
+        background: #fff;
+      }
+      #visor.anotando {
+        cursor: crosshair;
+      }
+      aside {
+        min-height: 0;
+        overflow: auto;
+        padding: 12px;
+        background: var(--painel);
+        border-left: 1px solid var(--borda);
+      }
+      aside h2 {
+        margin: 0 0 8px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--suave);
+      }
+      .vazio {
+        color: var(--suave);
+        font-size: 13px;
+      }
+      .nota {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 8px;
+        align-items: start;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--borda);
+      }
+      .nota textarea {
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 54px;
+        resize: vertical;
+        font: inherit;
+        color: var(--texto);
+        background: #2d2a38;
+        border: 1px solid var(--borda);
+        border-radius: 6px;
+        padding: 6px;
+      }
+      .nota button {
+        padding: 2px 8px;
+      }
+      .marcador {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--nota);
+        color: #1b1922;
+        border: 2px solid #fff;
+        box-shadow: 0 1px 4px #0008;
+        font: 700 11px/18px system-ui, sans-serif;
+        text-align: center;
+        cursor: pointer;
+      }
+      .marcador.pino {
+        background: var(--destaque);
+        color: #fff;
+      }
+      .escala {
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+        z-index: 5;
+        padding: 6px 9px;
+        border-radius: 8px;
+        background: #1b1922d9;
+        font-size: 12px;
+      }
+      .escala div {
+        height: 5px;
+        margin-bottom: 4px;
+        border-radius: 2px;
+        background: #fff;
+      }
+      dialog {
+        max-width: min(92vw, 900px);
+        color: var(--texto);
+        background: var(--painel);
+        border: 1px solid var(--borda);
+        border-radius: 10px;
+      }
+      dialog img {
+        display: block;
+        max-width: 100%;
+        max-height: 70vh;
+        margin-bottom: 8px;
+      }
+      .aviso {
+        padding: 24px;
+        color: var(--texto);
+        background: var(--fundo);
+      }
+      @media (max-width: 760px) {
+        body {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto 1fr 38vh;
+        }
+        aside {
+          border-left: 0;
+          border-top: 1px solid var(--borda);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1><span id="titulo">Lâmina virtual</span><small id="subtitulo">Protótipo · banco de lâminas</small></h1>
+      <button id="anotar" aria-pressed="false" title="Clique na lâmina para marcar um ponto e escrever uma nota">Anotar</button>
+      <button id="inteira" title="Ver a lâmina inteira">Lâmina inteira</button>
+    </header>
+    <div id="visor"></div>
+    <aside>
+      <h2>Minhas anotações</h2>
+      <div id="notas"></div>
+    </aside>
+    <dialog id="detalhe">
+      <img id="detalheImagem" alt="Foto de maior aumento" />
+      <p id="detalheTexto"></p>
+      <form method="dialog"><button>Fechar</button></form>
+    </dialog>
+    <script>
+      'use strict';
+      // Protótipo: as lâminas vêm de ../amostras/ (geradas por ferramentas/converter_lamina.py) e as anotações
+      // ficam só neste navegador. Na plataforma, as anotações irão para o banco de dados, ligadas à conta do aluno.
+      const $ = (id) => document.getElementById(id);
+      const parametros = new URLSearchParams(location.search);
+      const codigo = parametros.get('lamina') || 'CASO-001';
+      const base = (parametros.get('base') || '../amostras/').replace(/\/?$/, '/');
+      const chaveNotas = 'notas:' + codigo;
+      let viewer, ficha, anotando = false, notas = [], marcadoresNotas = [];
+
+      function lerNotas() {
+        try {
+          return JSON.parse(localStorage.getItem(chaveNotas)) || [];
+        } catch {
+          return [];
+        }
+      }
+      function gravarNotas() {
+        try {
+          localStorage.setItem(chaveNotas, JSON.stringify(notas.map(({ x, y, texto }) => ({ x, y, texto }))));
+        } catch {
+          // Sem armazenamento (janela anônima): as notas valem só enquanto a página estiver aberta.
+        }
+      }
+
+      function marcador(texto, classe) {
+        const el = document.createElement('div');
+        el.className = 'marcador' + (classe ? ' ' + classe : '');
+        el.textContent = texto;
+        return el;
+      }
+      function noPonto(x, y) {
+        return viewer.viewport.imageToViewportCoordinates(new OpenSeadragon.Point(x, y));
+      }
+      function irPara(x, y) {
+        viewer.viewport.panTo(noPonto(x, y));
+        viewer.viewport.zoomTo(Math.max(viewer.viewport.getZoom(), viewer.viewport.getMaxZoom() / 4));
+      }
+
+      function desenharNotas() {
+        for (const el of marcadoresNotas) viewer.removeOverlay(el);
+        marcadoresNotas = [];
+        const lista = $('notas');
+        lista.textContent = '';
+        if (!notas.length) {
+          lista.innerHTML = '<p class="vazio">Toque em <strong>Anotar</strong> e depois num ponto da lâmina para marcar o que observou.</p>';
+        }
+        notas.forEach((n, i) => {
+          const el = marcador(String(i + 1));
+          marcadoresNotas.push(el);
+          new OpenSeadragon.MouseTracker({ element: el, clickHandler: () => irPara(n.x, n.y) });
+          viewer.addOverlay({ element: el, location: noPonto(n.x, n.y), placement: OpenSeadragon.Placement.CENTER });
+
+          const item = document.createElement('div');
+          item.className = 'nota';
+          const ir = document.createElement('button');
+          ir.textContent = i + 1;
+          ir.title = 'Ir até este ponto';
+          ir.onclick = () => irPara(n.x, n.y);
+          const texto = document.createElement('textarea');
+          texto.value = n.texto;
+          texto.placeholder = 'O que você observou aqui?';
+          texto.oninput = () => {
+            n.texto = texto.value;
+            gravarNotas();
+          };
+          const apagar = document.createElement('button');
+          apagar.textContent = '×';
+          apagar.title = 'Apagar anotação';
+          apagar.onclick = () => {
+            notas.splice(i, 1);
+            gravarNotas();
+            desenharNotas();
+          };
+          item.append(ir, texto, apagar);
+          lista.append(item);
+          n.campo = texto;
+        });
+      }
+      function desenharPinos() {
+        for (const p of ficha.pinos || []) {
+          const el = marcador(p.rotulo || '•', 'pino');
+          el.title = p.texto || 'Foto de maior aumento';
+          new OpenSeadragon.MouseTracker({
+            element: el,
+            clickHandler: () => {
+              $('detalheImagem').hidden = !p.imagem;
+              if (p.imagem) $('detalheImagem').src = base + p.imagem;
+              $('detalheTexto').textContent = p.texto || '';
+              $('detalhe').showModal();
+            },
+          });
+          viewer.addOverlay({ element: el, location: noPonto(p.x, p.y), placement: OpenSeadragon.Placement.CENTER });
+        }
+      }
+
+      // Barra de escala: só aparece quando a lâmina tem calibração (µm por pixel).
+      function atualizarEscala() {
+        if (!ficha.umPorPixel) return;
+        const zoomImagem = viewer.viewport.viewportToImageZoom(viewer.viewport.getZoom(true));
+        const umPorPontoTela = ficha.umPorPixel / zoomImagem;
+        const opcoes = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000];
+        let L = opcoes[0];
+        for (const v of opcoes) if (v / umPorPontoTela <= 140) L = v;
+        $('regua').style.width = Math.max(16, L / umPorPontoTela) + 'px';
+        $('textoEscala').textContent = L >= 1000 ? String(L / 1000).replace('.', ',') + ' mm' : L + ' µm';
+      }
+
+      async function iniciar() {
+        const resposta = await fetch(base + codigo + '.json');
+        if (!resposta.ok) throw new Error('Lâmina ' + codigo + ' não encontrada em ' + base);
+        ficha = await resposta.json();
+        $('titulo').textContent = ficha.titulo || ficha.codigo;
+        document.title = (ficha.titulo || ficha.codigo) + ' · Lâmina virtual';
+        $('subtitulo').textContent = [ficha.codigo, ficha.objetiva ? ficha.objetiva + '×' : ''].filter(Boolean).join(' · ');
+
+        viewer = OpenSeadragon({
+          element: $('visor'),
+          tileSources: base + ficha.dzi,
+          showNavigationControl: false,
+          showNavigator: true,
+          navigatorPosition: 'BOTTOM_RIGHT',
+          maxZoomPixelRatio: 2,
+          visibilityRatio: 0.5,
+          gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true },
+          gestureSettingsTouch: { clickToZoom: false, dblClickToZoom: true },
+        });
+        if (ficha.umPorPixel) {
+          const escala = document.createElement('div');
+          escala.className = 'escala';
+          escala.innerHTML = '<div id="regua"></div><span id="textoEscala"></span>';
+          $('visor').append(escala);
+          viewer.addHandler('animation', atualizarEscala);
+        }
+        viewer.addHandler('open', () => {
+          notas = lerNotas();
+          desenharNotas();
+          desenharPinos();
+          atualizarEscala();
+        });
+        viewer.addHandler('canvas-click', (e) => {
+          if (!anotando || !e.quick) return;
+          e.preventDefaultAction = true;
+          const p = viewer.viewport.viewerElementToImageCoordinates(e.position);
+          if (p.x < 0 || p.y < 0 || p.x > ficha.largura || p.y > ficha.altura) return;
+          notas.push({ x: Math.round(p.x), y: Math.round(p.y), texto: '' });
+          gravarNotas();
+          desenharNotas();
+          notas[notas.length - 1].campo.focus();
+        });
+      }
+
+      $('anotar').onclick = () => {
+        anotando = !anotando;
+        $('anotar').setAttribute('aria-pressed', anotando);
+        $('visor').classList.toggle('anotando', anotando);
+      };
+      $('inteira').onclick = () => viewer && viewer.viewport.goHome();
+
+      iniciar().catch((erro) => {
+        $('visor').innerHTML = '<div class="aviso"></div>';
+        $('visor').firstChild.textContent = erro.message;
+      });
+    </script>
+  </body>
+</html>

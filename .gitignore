@@ -1,0 +1,6 @@
+# Lâminas convertidas ficam no armazenamento de arquivos, não no Git.
+amostras/
+*.html.zip
+__pycache__/
+.venv/
+.DS_Store
