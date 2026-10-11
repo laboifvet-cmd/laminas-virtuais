@@ -16,14 +16,69 @@
       {
         "pergunta": "Pergunta de exemplo, de múltipla escolha: qual o diagnóstico?",
         "resposta": "Alternativa certa (exemplo)",
-        "alternativas": ["Alternativa errada A (exemplo)", "Alternativa errada B (exemplo)", "Alternativa errada C (exemplo)"]
+        "alternativas": [
+          "Alternativa errada A (exemplo)",
+          "Alternativa errada B (exemplo)",
+          "Alternativa errada C (exemplo)"
+        ],
+        "explicacao": "Explicação de exemplo: aparece depois que o aluno responde."
       },
       {
         "pergunta": "Pergunta de exemplo, aberta: descreva o que você vê na superfície do fragmento.",
         "resposta": "Resposta de exemplo. Aqui entra o que o patologista espera que o aluno tenha visto.",
-        "alternativas": []
+        "alternativas": [],
+        "explicacao": ""
       }
     ],
-    "comentario": "Comentário de exemplo do patologista, mostrado depois do quiz."
+    "comentario": "Comentário de exemplo do patologista, mostrado depois do quiz.",
+    "raca": "",
+    "idade": "",
+    "sexo": "",
+    "historico": "Histórico de exemplo: aqui entra o que o patologista recebeu junto com a amostra (localização, tempo de evolução, aspecto macroscópico).",
+    "diferenciais": [
+      "Diferencial de exemplo A",
+      "Diferencial de exemplo B"
+    ]
+  },
+  {
+    "codigo": "CASO-002",
+    "exemplo": true,
+    "especie": "A definir",
+    "orgao": "A definir",
+    "categoria": "",
+    "coloracao": "HE",
+    "dificuldade": "Fácil",
+    "diagnostico": "Diagnóstico de exemplo (o patologista preenche na planilha)",
+    "achados": [
+      "Achado de exemplo 1: o que o aluno deve encontrar no aumento menor",
+      "Achado de exemplo 2: o detalhe que confirma o diagnóstico"
+    ],
+    "quiz": [
+      {
+        "pergunta": "Pergunta de exemplo, de múltipla escolha: qual o diagnóstico?",
+        "resposta": "Alternativa certa (exemplo)",
+        "alternativas": [
+          "Alternativa errada A (exemplo)",
+          "Alternativa errada B (exemplo)",
+          "Alternativa errada C (exemplo)"
+        ],
+        "explicacao": "Explicação de exemplo: aparece depois que o aluno responde."
+      },
+      {
+        "pergunta": "Pergunta de exemplo, aberta: descreva o que você vê na superfície do fragmento.",
+        "resposta": "Resposta de exemplo. Aqui entra o que o patologista espera que o aluno tenha visto.",
+        "alternativas": [],
+        "explicacao": ""
+      }
+    ],
+    "comentario": "Comentário de exemplo do patologista, mostrado depois do quiz.",
+    "raca": "",
+    "idade": "",
+    "sexo": "",
+    "historico": "Histórico de exemplo. A ficha deste caso está sendo preenchida no aplicativo das fichas.",
+    "diferenciais": [
+      "Diferencial de exemplo A",
+      "Diferencial de exemplo B"
+    ]
   }
 ]

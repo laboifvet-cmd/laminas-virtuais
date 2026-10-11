@@ -322,6 +322,17 @@ async function telaLamina(caso) {
       desenharQuiz();
     };
     corpoAba.textContent = '';
+    const animal = [caso.especie, caso.raca, caso.idade, caso.sexo].filter(Boolean).join(' · ');
+    if (caso.historico || animal)
+      corpoAba.append(
+        el(
+          'div',
+          { class: 'historico' },
+          el('span', { class: 'rotulo', text: 'Histórico' }),
+          animal ? el('strong', { text: animal }) : null,
+          caso.historico ? el('p', { text: caso.historico }) : null,
+        ),
+      );
     if (!caso.quiz.length) {
       corpoAba.append(el('p', { class: 'suave', text: 'Este caso ainda não tem perguntas. Examine a lâmina e veja o caso na aba ao lado.' }));
       return;
@@ -347,8 +358,10 @@ async function telaLamina(caso) {
             }),
           );
         }
-        if (resp.escolha != null)
+        if (resp.escolha != null) {
           bloco.append(el('p', { class: 'resultado ' + (resp.certo ? 'certo' : 'errado'), text: resp.certo ? 'Acertou.' : 'Não foi dessa vez. A certa está em verde.' }));
+          if (q.explicacao) bloco.append(el('p', { class: 'explicacao', text: q.explicacao }));
+        }
       } else {
         // Pergunta aberta: o aluno escreve, confere com a resposta do patologista e diz se acertou.
         const campo = el('textarea', { class: 'campo', id: `resposta-${caso.codigo}-${i}`, placeholder: 'Escreva sua resposta antes de conferir', disabled: resp.conferido });
@@ -368,6 +381,7 @@ async function telaLamina(caso) {
           );
         } else {
           bloco.append(el('div', { class: 'resposta-aberta' }, el('span', { class: 'suave', text: 'Resposta do patologista: ' }), q.resposta));
+          if (q.explicacao) bloco.append(el('p', { class: 'explicacao', text: q.explicacao }));
           if (resp.certo == null) {
             const marcar = (certo) => () => {
               estado.respostas[i] = { ...resp, certo };
@@ -455,6 +469,8 @@ async function telaLamina(caso) {
       el('span', { class: 'rotulo', text: 'Diagnóstico' }),
       el('p', { class: 'diagnostico', text: caso.diagnostico || 'Ainda não informado' }),
       el('dl', { class: 'ficha' }, linhas.flatMap(([k, v]) => [el('dt', { text: k }), el('dd', { text: v })])),
+      caso.diferenciais?.length ? el('span', { class: 'rotulo', text: 'Diagnósticos diferenciais' }) : null,
+      caso.diferenciais?.length ? el('ul', {}, caso.diferenciais.map((d) => el('li', { text: d }))) : null,
       caso.achados.length ? el('span', { class: 'rotulo', text: 'O que procurar na lâmina' }) : null,
       caso.achados.length ? el('ul', {}, caso.achados.map((a) => el('li', { text: a }))) : null,
       caso.comentario ? el('span', { class: 'rotulo', text: 'Comentário do patologista' }) : null,

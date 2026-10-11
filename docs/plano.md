@@ -13,6 +13,8 @@ Teoria e vídeos ficam para depois, se fizer sentido.
 - [x] Visualizador com zoom, minimapa, pinos de maior aumento e anotações do aluno (`prototipo/`)
 - [x] Site de demonstração com início, catálogo, quiz (múltipla escolha ou resposta aberta) e ficha do caso (`site/`)
 - [x] Planilha "Fichas dos casos" no Google Drive e gerador do catálogo a partir dela (`ferramentas/casos_da_planilha.py`)
+- [x] Aplicativo "Fichas das lâminas", que substitui a planilha, e gerador do catálogo a partir dele (`paginas/fichas.html`, `ferramentas/casos_do_app.py`)
+- [x] Página de envio das lâminas grandes, em partes (`paginas/envio.html`)
 - [ ] Converter 3 a 5 lâminas reais, preencher as fichas e mostrar ao colega patologista
 
 ### Fase 1: lançamento de teste (30 a 40 lâminas)
@@ -84,9 +86,17 @@ aceita. Enquanto não há a página de envio da plataforma:
 
 - **Compactar em .zip** (no Mac, botão direito > Comprimir). O base64 dos
   blocos encolhe cerca de 25%: a lâmina de teste foi de 30 MB para 22 MB.
+- **Página de envio** (`paginas/envio.html`) para as maiores: divide o arquivo
+  em partes de 15 MB, que o Claude baixa e junta.
 - Na plataforma, o administrador enviará as lâminas direto pelo navegador para
   o armazenamento, sem esse limite. Uma opção melhor ainda é o próprio
   Microview exportar no formato Deep Zoom.
+
+## Observação da segunda lâmina
+
+O fundo da P3834-26 saiu lilás, e alguns campos ficaram mais claros que os
+vizinhos, formando blocos visíveis no panorama. Vale corrigir o balanço de
+branco e o sombreamento de campo (flat-field) no Microview antes de escanear.
 
 ## Cuidados
 

@@ -14,6 +14,7 @@ O plano completo (fases, arquitetura, custos e cuidados) está em
 | `ferramentas/` | Conversor da lâmina do Microview para Deep Zoom |
 | `site/` | Site de demonstração: início, catálogo e página da lâmina com quiz e anotações |
 | `prototipo/` | Primeiro visualizador de teste (substituído pelo `site/`) |
+| `paginas/` | Aplicativo das fichas dos casos e página de envio das lâminas (artefatos do Claude) |
 | `tests/` | Testes automáticos |
 | `docs/` | Plano e decisões do projeto |
 | `amostras/`, `site/laminas/` | Lâminas convertidas para teste local (fora do Git) |
@@ -43,13 +44,14 @@ Cada lâmina vai para `site/laminas/<código>/`, e o catálogo fica em
 
 ```bash
 python ferramentas/converter_lamina.py lamina.html site/laminas/CASO-001 --codigo CASO-001 --bloco 1024
-python ferramentas/casos_da_planilha.py fichas.csv site/dados/casos.json
+python ferramentas/casos_do_app.py fichas/ site/dados/casos.json
 cd site && python -m http.server 8000
 ```
 
-Abra <http://localhost:8000/>. O `fichas.csv` é a planilha "Fichas dos casos"
-baixada do Google Sheets como CSV. Só entram os casos marcados "Sim" em
-"Pronto para publicar?" (use `--todos` para ver todos).
+Abra <http://localhost:8000/>. O catálogo vem do aplicativo "Fichas das
+lâminas" (`ferramentas/casos_do_app.py pasta_das_fichas site/dados/casos.json`)
+ou, no formato antigo, da planilha exportada em CSV (`casos_da_planilha.py`).
+Só entram os casos marcados como prontos (use `--todos` para ver todos).
 
 ## Ver o protótipo antigo
 

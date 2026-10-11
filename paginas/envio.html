@@ -1,0 +1,441 @@
+<title>Envio de Lâminas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,650&family=Public+Sans:wght@400;600;700&display=swap" />
+<style>
+  /* Página utilitária: uma coluna, área de soltar arquivo no alto, lista de envios abaixo. Cores da coloração HE. */
+  :root {
+    --fundo: #f7f5fa;
+    --superficie: #ffffff;
+    --texto: #1f1a2b;
+    --suave: #625a73;
+    --linha: #e3dded;
+    --hematoxilina: #4b2e83;
+    --hematoxilina-suave: #ece6f7;
+    --eosina: #b8336a;
+    --certo: #2f7d4f;
+    --errado: #b3261e;
+    --fonte-titulo: 'Newsreader', Georgia, serif;
+    --fonte-texto: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --fundo: #15131b;
+      --superficie: #1f1c27;
+      --texto: #ece8f3;
+      --suave: #a8a0b8;
+      --linha: #322d3d;
+      --hematoxilina: #a58cf0;
+      --hematoxilina-suave: #2b2540;
+      --eosina: #ec8fb6;
+      --certo: #6cc58f;
+      --errado: #f2948c;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --fundo: #15131b;
+    --superficie: #1f1c27;
+    --texto: #ece8f3;
+    --suave: #a8a0b8;
+    --linha: #322d3d;
+    --hematoxilina: #a58cf0;
+    --hematoxilina-suave: #2b2540;
+    --eosina: #ec8fb6;
+    --certo: #6cc58f;
+    --errado: #f2948c;
+    color-scheme: dark;
+  }
+  body {
+    background: var(--fundo);
+    color: var(--texto);
+    font: 16px/1.55 var(--fonte-texto);
+  }
+  .pagina {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 16px 48px;
+    display: grid;
+    gap: 24px;
+  }
+  h1,
+  h2 {
+    font-family: var(--fonte-titulo);
+    font-weight: 650;
+    line-height: 1.15;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h1 {
+    font-size: 34px;
+  }
+  h2 {
+    font-size: 22px;
+  }
+  p {
+    margin: 0;
+  }
+  .suave {
+    color: var(--suave);
+  }
+  .soltar {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    padding: 36px 20px;
+    border: 2px dashed var(--linha);
+    border-radius: 12px;
+    background: var(--superficie);
+    text-align: center;
+    cursor: pointer;
+  }
+  .soltar.sobre,
+  .soltar:hover {
+    border-color: var(--hematoxilina);
+    background: var(--hematoxilina-suave);
+  }
+  .soltar strong {
+    font-size: 18px;
+  }
+  .botao {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--hematoxilina);
+    background: var(--hematoxilina);
+    color: var(--superficie);
+    font: 600 15px var(--fonte-texto);
+    cursor: pointer;
+  }
+  .botao.contorno {
+    background: transparent;
+    color: var(--hematoxilina);
+  }
+  .botao.perigo {
+    border-color: var(--errado);
+    background: transparent;
+    color: var(--errado);
+  }
+  .botao:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  :focus-visible {
+    outline: 2px solid var(--eosina);
+    outline-offset: 2px;
+  }
+  .aviso {
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--hematoxilina-suave);
+  }
+  .aviso.erro {
+    color: var(--errado);
+  }
+  ul.envios {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .envio {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border: 1px solid var(--linha);
+    border-radius: 10px;
+    background: var(--superficie);
+  }
+  .envio .nome {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .envio .info {
+    grid-column: 1 / -1;
+    font-size: 14px;
+    color: var(--suave);
+    font-variant-numeric: tabular-nums;
+  }
+  .estado {
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: var(--hematoxilina-suave);
+  }
+  .estado.pronto {
+    color: var(--certo);
+  }
+  .estado.erro {
+    color: var(--errado);
+  }
+  .barra {
+    grid-column: 1 / -1;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--linha);
+    overflow: hidden;
+  }
+  .barra div {
+    height: 100%;
+    background: var(--hematoxilina);
+    transition: width 0.2s;
+  }
+  .acoes {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  ol.passos {
+    margin: 0;
+    padding-left: 22px;
+    display: grid;
+    gap: 4px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .barra div {
+      transition: none;
+    }
+  }
+</style>
+
+<div class="pagina">
+  <header style="display: grid; gap: 8px">
+    <h1>Envio de lâminas</h1>
+    <p class="suave">Para lâminas do Microview grandes demais para mandar na conversa. A página divide o arquivo em partes e guarda tudo junto desta página, que só você acessa.</p>
+  </header>
+
+  <ol class="passos">
+    <li>Arraste o arquivo <strong>.html</strong> da lâmina para a área abaixo (pode ser mais de um).</li>
+    <li>Espere aparecer <strong>Enviada</strong>.</li>
+    <li>Volte à conversa e avise o Claude que enviou.</li>
+  </ol>
+
+  <label class="soltar" id="soltar" for="arquivo">
+    <strong>Arraste a lâmina aqui</strong>
+    <span class="suave">ou toque para escolher o arquivo .html</span>
+    <input id="arquivo" type="file" accept=".html,.htm,text/html" multiple hidden />
+  </label>
+  <p class="aviso" id="aviso" hidden></p>
+
+  <section style="display: grid; gap: 12px">
+    <h2>Lâminas enviadas</h2>
+    <p class="suave" id="uso"></p>
+    <ul class="envios" id="lista"><li class="suave" id="vazio">Nenhuma lâmina enviada ainda. A primeira que você mandar aparece aqui.</li></ul>
+  </section>
+</div>
+
+<script>
+  'use strict';
+  // Cada parte fica abaixo do limite de 20 MiB por arquivo do armazenamento.
+  const TAMANHO_PARTE = 15 * 1024 * 1024;
+  const MARCA_MICROVIEW = '<script id="dados" type="application/json">';
+  const $ = (id) => document.getElementById(id);
+  let assets = null;
+  let db = null;
+  const emAndamento = new Map(); // envios ainda subindo, só nesta aba
+
+  const mb = (bytes) => (bytes / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' MB';
+  const data = (iso) => new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+
+  function avisar(texto, erro) {
+    $('aviso').textContent = texto;
+    $('aviso').classList.toggle('erro', !!erro);
+    $('aviso').hidden = !texto;
+  }
+
+  function el(tag, props = {}, ...filhos) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (v == null) continue;
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v);
+    }
+    e.append(...filhos.filter((f) => f != null));
+    return e;
+  }
+
+  // Corta os bytes em partes sem partir um caractere acentuado (UTF-8) ao meio.
+  function partes(bytes) {
+    const lista = [];
+    let inicio = 0;
+    while (inicio < bytes.length) {
+      let fim = Math.min(bytes.length, inicio + TAMANHO_PARTE);
+      while (fim < bytes.length && (bytes[fim] & 0xc0) === 0x80) fim--;
+      lista.push(bytes.subarray(inicio, fim));
+      inicio = fim;
+    }
+    return lista;
+  }
+
+  let documentos = [];
+  function desenhar() {
+    const lista = $('lista');
+    lista.textContent = '';
+    const itens = [
+      ...[...emAndamento.values()],
+      ...documentos.map((d) => ({ id: d.id, ...d.data() })),
+    ];
+    if (!itens.length) {
+      lista.append(el('li', { class: 'suave', text: 'Nenhuma lâmina enviada ainda. A primeira que você mandar aparece aqui.' }));
+      return;
+    }
+    for (const item of itens) {
+      const estado = item.erro
+        ? el('span', { class: 'estado erro', text: 'Falhou' })
+        : item.enviando
+          ? el('span', { class: 'estado', text: `Enviando ${item.feitas}/${item.total}` })
+          : item.convertida
+            ? el('span', { class: 'estado pronto', text: 'Convertida' })
+            : el('span', { class: 'estado pronto', text: 'Enviada' });
+      const li = el(
+        'li',
+        { class: 'envio' },
+        el('span', { class: 'nome', text: item.arquivo }),
+        estado,
+        el('span', { class: 'info', text: [mb(item.bytes), item.enviadaEm ? 'enviada em ' + data(item.enviadaEm) : null, item.erro || null].filter(Boolean).join(' · ') }),
+      );
+      if (item.enviando) li.append(el('div', { class: 'barra' }, el('div', { style: `width:${Math.round((item.feitas / item.total) * 100)}%` })));
+      if (!item.enviando && item.id && assets) {
+        const acoes = el('div', { class: 'acoes' });
+        const apagar = el('button', {
+          class: 'botao perigo',
+          type: 'button',
+          text: 'Apagar arquivo',
+          onclick: () => {
+            acoes.textContent = '';
+            acoes.append(
+              el('span', { class: 'suave', text: 'Apagar esta lâmina daqui? A versão já convertida no site não é afetada.' }),
+              el('button', { class: 'botao perigo', type: 'button', text: 'Sim, apagar', onclick: () => apagarEnvio(item) }),
+              el('button', { class: 'botao contorno', type: 'button', text: 'Cancelar', onclick: desenhar }),
+            );
+          },
+        });
+        acoes.append(apagar);
+        li.append(acoes);
+      }
+      lista.append(li);
+    }
+  }
+
+  async function apagarEnvio(item) {
+    try {
+      for (const id of item.partes || []) await assets.delete(id);
+      await db.collection('envios').doc(item.id).delete();
+      atualizarUso();
+    } catch (e) {
+      avisar('Não foi possível apagar agora. Tente de novo em instantes.', true);
+    }
+  }
+
+  async function atualizarUso() {
+    if (!assets) return;
+    try {
+      const { usage } = await assets.list();
+      $('uso').textContent = `Espaço usado: ${mb(usage.bytes)} de ${mb(usage.maxBytes)}.`;
+    } catch {
+      $('uso').textContent = '';
+    }
+  }
+
+  async function enviar(arquivo) {
+    const chave = arquivo.name + ':' + Date.now();
+    const item = { arquivo: arquivo.name, bytes: arquivo.size, enviando: true, feitas: 0, total: 1 };
+    emAndamento.set(chave, item);
+    desenhar();
+    const enviados = [];
+    try {
+      const bytes = new Uint8Array(await arquivo.arrayBuffer());
+      const inicio = new TextDecoder().decode(bytes.subarray(0, Math.min(bytes.length, 200000)));
+      const texto = inicio.includes(MARCA_MICROVIEW) ? true : new TextDecoder().decode(bytes).includes(MARCA_MICROVIEW);
+      if (!texto) throw new Error('Este arquivo não parece ser uma lâmina virtual do Microview.');
+      const lista = partes(bytes);
+      item.total = lista.length;
+      desenhar();
+      for (const parte of lista) {
+        const r = await assets.upload(new Blob([parte], { type: 'text/plain' }), { type: 'text/plain' });
+        enviados.push(r.id);
+        item.feitas++;
+        desenhar();
+      }
+      await db.collection('envios').add({
+        arquivo: arquivo.name,
+        bytes: arquivo.size,
+        partes: enviados,
+        enviadaEm: new Date().toISOString(),
+        convertida: false,
+      });
+      emAndamento.delete(chave);
+      avisar('');
+    } catch (e) {
+      // Partes de um envio que falhou não servem para nada: remove para não ocupar espaço.
+      for (const id of enviados) assets.delete(id).catch(() => {});
+      item.enviando = false;
+      item.erro =
+        e?.code === 'quota_or_state'
+          ? 'Sem espaço. Apague lâminas já convertidas e tente de novo.'
+          : e?.code === 'rate_limited'
+            ? 'Muitos envios seguidos. Espere um minuto e tente de novo.'
+            : e?.message && !e.code
+              ? e.message
+              : 'O envio falhou. Confira a conexão e tente de novo.';
+    }
+    desenhar();
+    atualizarUso();
+  }
+
+  function receber(arquivos) {
+    if (!assets || !db) {
+      avisar('O envio só funciona com a página aberta na sua conta do Claude.', true);
+      return;
+    }
+    for (const a of arquivos) {
+      if (!/\.html?$/i.test(a.name)) {
+        avisar(`"${a.name}" não é um arquivo .html. Envie o arquivo da lâmina sem compactar.`, true);
+        continue;
+      }
+      enviar(a);
+    }
+  }
+
+  const soltar = $('soltar');
+  $('arquivo').addEventListener('change', (e) => {
+    receber([...e.target.files]);
+    e.target.value = '';
+  });
+  soltar.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    soltar.classList.add('sobre');
+  });
+  soltar.addEventListener('dragleave', () => soltar.classList.remove('sobre'));
+  soltar.addEventListener('drop', (e) => {
+    e.preventDefault();
+    soltar.classList.remove('sobre');
+    receber([...e.dataTransfer.files]);
+  });
+
+  (async () => {
+    [assets, db] = await Promise.all([claude.use('assets'), claude.use('db')]);
+    if (!assets || !db) {
+      avisar('Abra esta página logado na sua conta do Claude para enviar lâminas.', true);
+      return;
+    }
+    db.collection('envios')
+      .orderBy('enviadaEm', 'desc')
+      .onSnapshot(
+        (snap) => {
+          documentos = snap.docs;
+          desenhar();
+        },
+        () => avisar('A lista de envios parou de atualizar. Recarregue a página.', true),
+      );
+    atualizarUso();
+  })();
+</script>

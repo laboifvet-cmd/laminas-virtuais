@@ -1,0 +1,1200 @@
+<title>Fichas das Lâminas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Newsreader:opsz,wght@6..72,500;6..72,650&family=Public+Sans:wght@400;500;600;700&display=swap" />
+<style>
+  /* Duas colunas: à esquerda a lista de casos como uma caixa de lâminas; à direita a ficha do caso aberto,
+     em blocos (lâmina, diagnóstico, achados, quiz, revisão). Cores da coloração HE. */
+  :root {
+    --fundo: #f4f2f7;
+    --superficie: #ffffff;
+    --superficie-2: #faf9fc;
+    --texto: #1f1a2b;
+    --suave: #645c75;
+    --linha: #e3dded;
+    --hematoxilina: #4b2e83;
+    --hematoxilina-suave: #ece6f7;
+    --eosina: #b8336a;
+    --eosina-suave: #fbe7ef;
+    --certo: #2f7d4f;
+    --certo-suave: #e3f3e9;
+    --atencao: #8a5a00;
+    --atencao-suave: #fbf0d9;
+    --errado: #b3261e;
+    --fonte-titulo: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+    --fonte-texto: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    --fonte-dado: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+    --raio: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --fundo: #131118;
+      --superficie: #1d1a24;
+      --superficie-2: #221f2a;
+      --texto: #ece8f3;
+      --suave: #a8a0b8;
+      --linha: #322d3d;
+      --hematoxilina: #a58cf0;
+      --hematoxilina-suave: #2b2540;
+      --eosina: #ec8fb6;
+      --eosina-suave: #3a2230;
+      --certo: #6cc58f;
+      --certo-suave: #1d3326;
+      --atencao: #f0c36a;
+      --atencao-suave: #3a2f17;
+      --errado: #f2948c;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --fundo: #131118;
+    --superficie: #1d1a24;
+    --superficie-2: #221f2a;
+    --texto: #ece8f3;
+    --suave: #a8a0b8;
+    --linha: #322d3d;
+    --hematoxilina: #a58cf0;
+    --hematoxilina-suave: #2b2540;
+    --eosina: #ec8fb6;
+    --eosina-suave: #3a2230;
+    --certo: #6cc58f;
+    --certo-suave: #1d3326;
+    --atencao: #f0c36a;
+    --atencao-suave: #3a2f17;
+    --errado: #f2948c;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    background: var(--fundo);
+    color: var(--texto);
+    font: 15px/1.5 var(--fonte-texto);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--fonte-titulo);
+    font-weight: 650;
+    line-height: 1.15;
+    margin: 0;
+    text-wrap: balance;
+  }
+  p {
+    margin: 0;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  :focus-visible {
+    outline: 2px solid var(--eosina);
+    outline-offset: 2px;
+  }
+  .app {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+
+  /* ---------- Lista de casos ---------- */
+  .caixa {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 12px;
+    padding: 20px 16px;
+    border-right: 1px solid var(--linha);
+    background: var(--superficie);
+    min-height: 0;
+  }
+  .caixa h1 {
+    font-size: 26px;
+  }
+  .caixa .sub {
+    color: var(--suave);
+    font-size: 13px;
+  }
+  .busca {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--linha);
+    background: var(--superficie-2);
+  }
+  .lista {
+    overflow: auto;
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    margin: 0 -6px;
+    padding: 2px 6px;
+  }
+  .item {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+  }
+  .item:hover {
+    background: var(--superficie-2);
+  }
+  .item[aria-current='true'] {
+    background: var(--hematoxilina-suave);
+    border-color: var(--hematoxilina);
+  }
+  .mini {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    background: #fff center / contain no-repeat;
+    border: 1px solid var(--linha);
+  }
+  .mini.vazia {
+    background: repeating-linear-gradient(45deg, var(--superficie-2), var(--superficie-2) 4px, var(--linha) 4px, var(--linha) 5px);
+  }
+  .item-texto {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+  .item-texto strong {
+    font-family: var(--fonte-dado);
+    font-size: 13px;
+    letter-spacing: 0.03em;
+  }
+  .item-texto span {
+    color: var(--suave);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .selo {
+    justify-self: start;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .selo.rascunho {
+    background: var(--superficie-2);
+    color: var(--suave);
+    border: 1px solid var(--linha);
+  }
+  .selo.revisao {
+    background: var(--atencao-suave);
+    color: var(--atencao);
+  }
+  .selo.pronta {
+    background: var(--certo-suave);
+    color: var(--certo);
+  }
+
+  /* ---------- Botões ---------- */
+  .botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--hematoxilina);
+    background: var(--hematoxilina);
+    color: var(--superficie);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .botao.contorno {
+    background: transparent;
+    color: var(--hematoxilina);
+  }
+  .botao.discreto {
+    border-color: var(--linha);
+    background: var(--superficie);
+    color: var(--texto);
+  }
+  .botao.perigo {
+    border-color: var(--errado);
+    background: transparent;
+    color: var(--errado);
+  }
+  .botao.pequeno {
+    padding: 5px 12px;
+    font-size: 13px;
+  }
+  .icone {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid var(--linha);
+    background: var(--superficie);
+    color: var(--suave);
+    cursor: pointer;
+    flex: none;
+  }
+  .icone:hover {
+    color: var(--errado);
+    border-color: var(--errado);
+  }
+
+  /* ---------- Ficha ---------- */
+  .ficha {
+    overflow: auto;
+    min-height: 0;
+  }
+  .ficha-miolo {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 20px 64px;
+    display: grid;
+    gap: 18px;
+  }
+  .cabeca {
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr);
+    gap: 18px;
+    align-items: center;
+  }
+  .cabeca .mini {
+    width: 132px;
+    height: 132px;
+    border-radius: 12px;
+  }
+  .cabeca-texto {
+    display: grid;
+    gap: 6px;
+  }
+  .cabeca-texto .codigo {
+    font-family: var(--fonte-dado);
+    color: var(--hematoxilina);
+    letter-spacing: 0.04em;
+  }
+  .cabeca-texto h2 {
+    font-size: 30px;
+  }
+  .linha-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: center;
+    color: var(--suave);
+    font-size: 13px;
+  }
+  .voltar {
+    display: none;
+  }
+  .falta {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--atencao-suave);
+    color: var(--atencao);
+    font-size: 13px;
+  }
+  .falta.ok {
+    background: var(--certo-suave);
+    color: var(--certo);
+  }
+  .bloco {
+    display: grid;
+    gap: 16px;
+    padding: 20px;
+    border-radius: var(--raio);
+    background: var(--superficie);
+    border: 1px solid var(--linha);
+  }
+  .bloco > header {
+    display: grid;
+    gap: 2px;
+  }
+  .bloco h3 {
+    font-size: 21px;
+  }
+  .bloco > header p {
+    color: var(--suave);
+    font-size: 13px;
+  }
+  .grade2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .grade3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .campo {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+  }
+  .campo > label,
+  .campo > .rotulo {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .campo small {
+    color: var(--suave);
+    font-size: 12px;
+  }
+  input[type='text'],
+  textarea,
+  select {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--linha);
+    background: var(--superficie-2);
+  }
+  input[type='text']:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--hematoxilina);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--hematoxilina-suave);
+  }
+  textarea {
+    min-height: 84px;
+    resize: vertical;
+  }
+  .sugestoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    padding: 4px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--linha);
+    background: var(--superficie);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .chip:hover {
+    border-color: var(--hematoxilina);
+  }
+  .chip[aria-pressed='true'] {
+    background: var(--hematoxilina);
+    border-color: var(--hematoxilina);
+    color: var(--superficie);
+  }
+  .segmentos {
+    display: inline-flex;
+    justify-self: start;
+    max-width: 100%;
+    border: 1px solid var(--linha);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .segmentos button {
+    padding: 8px 14px;
+    border: 0;
+    border-right: 1px solid var(--linha);
+    background: var(--superficie);
+    cursor: pointer;
+  }
+  .segmentos button:last-child {
+    border-right: 0;
+  }
+  .segmentos button[aria-pressed='true'] {
+    background: var(--hematoxilina);
+    color: var(--superficie);
+  }
+  .linhas {
+    display: grid;
+    gap: 8px;
+  }
+  .linha-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .linha-item .marca {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--eosina-suave);
+    color: var(--eosina);
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .linha-item .marca.errada {
+    background: var(--superficie-2);
+    color: var(--suave);
+    border: 1px solid var(--linha);
+  }
+  .linha-item .marca.certa {
+    background: var(--certo-suave);
+    color: var(--certo);
+  }
+  .adicionar {
+    justify-self: start;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px dashed var(--linha);
+    background: none;
+    color: var(--hematoxilina);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .adicionar:hover {
+    border-color: var(--hematoxilina);
+  }
+  .pergunta {
+    display: grid;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 10px;
+    background: var(--superficie-2);
+    border: 1px solid var(--linha);
+  }
+  .pergunta-topo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .pergunta-topo strong {
+    font-family: var(--fonte-titulo);
+    font-size: 18px;
+  }
+  .confirmar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+  }
+  .vazio-ficha {
+    display: grid;
+    place-content: center;
+    gap: 12px;
+    height: 100%;
+    padding: 24px;
+    text-align: center;
+    color: var(--suave);
+  }
+  .vazio-ficha h2 {
+    color: var(--texto);
+    font-size: 28px;
+  }
+  .aviso {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--eosina-suave);
+    color: var(--texto);
+    font-size: 14px;
+  }
+  .lado-a-lado {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  @media (max-width: 820px) {
+    .app {
+      grid-template-columns: 1fr;
+    }
+    .app.aberta .caixa {
+      display: none;
+    }
+    .app:not(.aberta) .ficha {
+      display: none;
+    }
+    .caixa {
+      border-right: 0;
+    }
+    .voltar {
+      display: inline-flex;
+      justify-self: start;
+    }
+    .grade2,
+    .grade3 {
+      grid-template-columns: 1fr;
+    }
+    .cabeca {
+      grid-template-columns: 84px minmax(0, 1fr);
+    }
+    .cabeca .mini {
+      width: 84px;
+      height: 84px;
+    }
+    .cabeca-texto h2 {
+      font-size: 24px;
+    }
+  }
+</style>
+
+<div class="app" id="app">
+  <aside class="caixa">
+    <div>
+      <h1>Fichas das lâminas</h1>
+      <p class="sub" id="contagem">Carregando os casos…</p>
+    </div>
+    <div class="lado-a-lado">
+      <input class="busca" id="busca" type="text" placeholder="Buscar" aria-label="Buscar casos" style="flex: 1; min-width: 0" />
+      <button class="botao pequeno" id="novo" type="button">+ Novo caso</button>
+    </div>
+    <div class="lista" id="lista"></div>
+  </aside>
+  <main class="ficha" id="ficha">
+    <div class="vazio-ficha">
+      <h2>Escolha um caso</h2>
+      <p>Ou crie um novo. Tudo o que você escreve é salvo sozinho.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+  'use strict';
+  // Ficha de cada caso guardada em casos/<código> no banco desta página. O Claude lê esse banco para montar o
+  // catálogo do site; só entram os casos com situação "Pronta".
+  const ESPECIES = ['Cão', 'Gato', 'Equino', 'Bovino', 'Ovino', 'Caprino', 'Suíno', 'Ave', 'Coelho', 'Silvestre'];
+  const ORGAOS = ['Pele', 'Subcutâneo', 'Glândula mamária', 'Linfonodo', 'Baço', 'Fígado', 'Rim', 'Pulmão', 'Intestino', 'Estômago', 'Cavidade oral', 'Útero', 'Ovário', 'Testículo', 'Bexiga', 'Osso', 'Músculo', 'Encéfalo', 'Olho', 'Coração'];
+  const COLORACOES = ['HE', 'PAS', 'Tricrômico de Masson', 'Giemsa', 'Azul de toluidina', 'Ziehl-Neelsen', 'Grocott', 'Imuno-histoquímica'];
+  const CATEGORIAS = ['Neoplasia', 'Inflamatória', 'Infecciosa ou parasitária', 'Degenerativa', 'Circulatória', 'Hiperplasia ou displasia', 'Do desenvolvimento', 'Tecido normal'];
+  const DIFICULDADES = ['Fácil', 'Médio', 'Difícil'];
+  const SITUACOES = [
+    ['rascunho', 'Rascunho'],
+    ['revisao', 'Em revisão'],
+    ['pronta', 'Pronta para publicar'],
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  let db = null;
+  let casos = new Map();
+  let aberto = null; // cópia local do caso em edição
+  let ultimaEdicao = 0;
+  let timerSalvar = null;
+  let salvando = Promise.resolve();
+  let estadoSalvo = '';
+
+  function el(tag, props = {}, ...filhos) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (v == null || v === false) continue;
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (k === 'value') e.value = v;
+      else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v === true ? '' : v);
+    }
+    for (const f of filhos.flat()) if (f != null && f !== false) e.append(f instanceof Node ? f : document.createTextNode(f));
+    return e;
+  }
+
+  function casoVazio(codigo) {
+    return {
+      codigo,
+      arquivo: '',
+      miniatura: '',
+      especie: '',
+      raca: '',
+      idade: '',
+      sexo: '',
+      historico: '',
+      orgao: '',
+      coloracao: 'HE',
+      categoria: '',
+      diagnostico: '',
+      diferenciais: [],
+      dificuldade: 'Médio',
+      achados: [''],
+      quiz: [{ tipo: 'multipla', pergunta: 'Qual o diagnóstico?', resposta: '', alternativas: ['', '', ''], explicacao: '' }],
+      comentario: '',
+      revisadoPor: '',
+      situacao: 'rascunho',
+    };
+  }
+  // Garante todos os campos (casos criados antes de um campo existir).
+  function completar(dados) {
+    const base = casoVazio(dados.codigo);
+    const c = { ...base, ...structuredClone(dados) };
+    for (const k of ['diferenciais', 'achados', 'quiz']) if (!Array.isArray(c[k])) c[k] = base[k];
+    // Achados e quiz sempre começam com um item em branco, para a ficha mostrar onde escrever.
+    if (!c.achados.length) c.achados = base.achados;
+    if (!c.quiz.length) c.quiz = base.quiz;
+    c.quiz = c.quiz.map((q) => ({ tipo: 'multipla', pergunta: '', resposta: '', alternativas: [], explicacao: '', ...q }));
+    return c;
+  }
+
+  function oQueFalta(c) {
+    const falta = [];
+    if (!c.especie.trim()) falta.push('espécie');
+    if (!c.orgao.trim()) falta.push('órgão');
+    if (!c.historico.trim()) falta.push('histórico');
+    if (!c.diagnostico.trim()) falta.push('diagnóstico');
+    if (!c.achados.some((a) => a.trim())) falta.push('pelo menos um achado');
+    const perguntas = c.quiz.filter((q) => q.pergunta.trim());
+    if (!perguntas.length) falta.push('uma pergunta do quiz');
+    for (const [i, q] of c.quiz.entries()) {
+      if (!q.pergunta.trim()) continue;
+      if (!q.resposta.trim()) falta.push(`resposta da pergunta ${i + 1}`);
+      if (q.tipo === 'multipla' && q.alternativas.filter((a) => a.trim()).length < 2) falta.push(`2 alternativas erradas na pergunta ${i + 1}`);
+    }
+    return falta;
+  }
+
+  const miniaturaUrl = (c) => (c.miniatura ? '/_blob/' + c.miniatura : '');
+  const nomeSituacao = (s) => (SITUACOES.find(([k]) => k === s) || SITUACOES[0])[1];
+
+  // ---------- Lista ----------
+  function desenharLista() {
+    const termo = $('busca').value.trim().toLowerCase();
+    const todos = [...casos.values()].sort((a, b) => a.codigo.localeCompare(b.codigo, 'pt-BR', { numeric: true }));
+    const prontas = todos.filter((c) => c.situacao === 'pronta').length;
+    $('contagem').textContent = todos.length ? `${todos.length} ${todos.length === 1 ? 'caso' : 'casos'} · ${prontas} ${prontas === 1 ? 'pronto' : 'prontos'} para publicar` : 'Nenhum caso ainda.';
+    const lista = $('lista');
+    lista.textContent = '';
+    const filtrados = todos.filter((c) => !termo || [c.codigo, c.especie, c.orgao, c.diagnostico, c.arquivo].join(' ').toLowerCase().includes(termo));
+    if (!filtrados.length && todos.length) lista.append(el('p', { class: 'sub', text: 'Nenhum caso com essa busca.' }));
+    for (const c of filtrados) {
+      const url = miniaturaUrl(c);
+      lista.append(
+        el(
+          'button',
+          { class: 'item', type: 'button', 'aria-current': aberto?.codigo === c.codigo ? 'true' : 'false', onclick: () => abrir(c.codigo) },
+          el('span', { class: 'mini' + (url ? '' : ' vazia'), style: url ? `background-image:url("${url}")` : null }),
+          el(
+            'span',
+            { class: 'item-texto' },
+            el('strong', { text: c.codigo }),
+            el('span', { text: [c.especie, c.orgao].filter(Boolean).join(' · ') || 'Sem espécie e órgão' }),
+            el('span', { class: 'selo ' + c.situacao, text: nomeSituacao(c.situacao) }),
+          ),
+        ),
+      );
+    }
+  }
+
+  // ---------- Salvar ----------
+  function semData(c) {
+    const { atualizadoEm, ...resto } = c;
+    return JSON.stringify(resto);
+  }
+  function marcarStatus(texto) {
+    const s = $('salvo');
+    if (s) s.textContent = texto;
+    estadoSalvo = texto;
+  }
+  function mudou() {
+    ultimaEdicao = Date.now();
+    marcarStatus('Salvando…');
+    clearTimeout(timerSalvar);
+    timerSalvar = setTimeout(salvarAgora, 700);
+    atualizarFalta();
+  }
+  function salvarAgora() {
+    clearTimeout(timerSalvar);
+    timerSalvar = null;
+    if (!aberto || !db) return salvando;
+    const copia = { ...structuredClone(aberto), atualizadoEm: new Date().toISOString() };
+    // Uma escrita por vez no mesmo documento: encadeia na anterior.
+    salvando = salvando
+      .then(() => db.collection('casos').doc(copia.codigo).set(copia))
+      .then(() => {
+        casos.set(copia.codigo, copia);
+        if (!timerSalvar) marcarStatus('Salvo às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }));
+        desenharLista();
+      })
+      .catch(() => marcarStatus('Não foi possível salvar. Confira a conexão; o texto continua aqui.'));
+    return salvando;
+  }
+
+  // ---------- Ficha ----------
+  function campoTexto(rotulo, chave, { dica, linhas, placeholder, sugestoes } = {}) {
+    const id = 'f-' + chave;
+    const entrada = linhas ? el('textarea', { id, rows: linhas, placeholder }) : el('input', { id, type: 'text', placeholder });
+    entrada.value = aberto[chave] || '';
+    entrada.addEventListener('input', () => {
+      aberto[chave] = entrada.value;
+      if (chips) marcarChips();
+      mudou();
+    });
+    let chips = null;
+    function marcarChips() {
+      for (const b of chips.children) b.setAttribute('aria-pressed', b.textContent === entrada.value ? 'true' : 'false');
+    }
+    if (sugestoes) {
+      chips = el(
+        'div',
+        { class: 'sugestoes' },
+        sugestoes.map((s) =>
+          el('button', {
+            type: 'button',
+            class: 'chip',
+            text: s,
+            onclick: () => {
+              entrada.value = s;
+              aberto[chave] = s;
+              marcarChips();
+              mudou();
+            },
+          }),
+        ),
+      );
+      marcarChips();
+    }
+    return el('div', { class: 'campo' }, el('label', { for: id, text: rotulo }), entrada, chips, dica ? el('small', { text: dica }) : null);
+  }
+
+  function segmentos(rotulo, chave, opcoes) {
+    const caixa = el('div', { class: 'segmentos', role: 'group', 'aria-label': rotulo });
+    function desenhar() {
+      caixa.textContent = '';
+      for (const [valor, nome] of opcoes)
+        caixa.append(
+          el('button', {
+            type: 'button',
+            'aria-pressed': aberto[chave] === valor ? 'true' : 'false',
+            text: nome,
+            onclick: () => {
+              aberto[chave] = valor;
+              desenhar();
+              if (chave === 'situacao') desenharCabeca();
+              mudou();
+            },
+          }),
+        );
+    }
+    desenhar();
+    return el('div', { class: 'campo' }, el('span', { class: 'rotulo', text: rotulo }), caixa);
+  }
+
+  // Lista de textos (achados, diferenciais, alternativas): uma linha por item, com botão de remover.
+  function listaTextos(itens, { marca, placeholder, rotuloAdicionar, minimo = 0, idBase }) {
+    const caixa = el('div', { class: 'linhas' });
+    function desenhar(focar) {
+      caixa.textContent = '';
+      itens.forEach((valor, i) => {
+        const entrada = el('input', { type: 'text', id: `${idBase}-${i}`, placeholder: typeof placeholder === 'function' ? placeholder(i) : placeholder, 'aria-label': (typeof placeholder === 'function' ? placeholder(i) : placeholder) || 'Item' });
+        entrada.value = valor;
+        entrada.addEventListener('input', () => {
+          itens[i] = entrada.value;
+          mudou();
+        });
+        entrada.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            itens.splice(i + 1, 0, '');
+            desenhar(i + 1);
+            mudou();
+          }
+        });
+        caixa.append(
+          el(
+            'div',
+            { class: 'linha-item' },
+            marca ? marca(i) : null,
+            entrada,
+            itens.length > minimo
+              ? el('button', {
+                  type: 'button',
+                  class: 'icone',
+                  title: 'Remover',
+                  'aria-label': 'Remover',
+                  text: '×',
+                  onclick: () => {
+                    itens.splice(i, 1);
+                    desenhar();
+                    mudou();
+                  },
+                })
+              : null,
+          ),
+        );
+        if (focar === i) entrada.focus();
+      });
+      caixa.append(
+        el('button', {
+          type: 'button',
+          class: 'adicionar',
+          text: rotuloAdicionar,
+          onclick: () => {
+            itens.push('');
+            desenhar(itens.length - 1);
+            mudou();
+          },
+        }),
+      );
+    }
+    desenhar();
+    return caixa;
+  }
+
+  function blocoQuiz() {
+    const caixa = el('div', { class: 'linhas', style: 'gap:14px' });
+    function desenhar() {
+      caixa.textContent = '';
+      aberto.quiz.forEach((q, i) => {
+        const pergunta = el('textarea', { id: `q-${i}-pergunta`, rows: 2, placeholder: 'Ex.: Qual o diagnóstico? / O que predomina no infiltrado?' });
+        pergunta.value = q.pergunta;
+        pergunta.addEventListener('input', () => {
+          q.pergunta = pergunta.value;
+          mudou();
+        });
+        const resposta = el('input', { id: `q-${i}-resposta`, type: 'text', placeholder: q.tipo === 'multipla' ? 'A alternativa certa' : 'O que o aluno deveria responder' });
+        resposta.value = q.resposta;
+        resposta.addEventListener('input', () => {
+          q.resposta = resposta.value;
+          mudou();
+        });
+        const explicacao = el('textarea', { id: `q-${i}-explicacao`, rows: 2, placeholder: 'Opcional: por que essa é a resposta (aparece depois que o aluno responde)' });
+        explicacao.value = q.explicacao;
+        explicacao.addEventListener('input', () => {
+          q.explicacao = explicacao.value;
+          mudou();
+        });
+        const tipo = el(
+          'div',
+          { class: 'segmentos', role: 'group', 'aria-label': 'Tipo de pergunta' },
+          [
+            ['multipla', 'Múltipla escolha'],
+            ['aberta', 'Resposta aberta'],
+          ].map(([v, n]) =>
+            el('button', {
+              type: 'button',
+              'aria-pressed': q.tipo === v ? 'true' : 'false',
+              text: n,
+              onclick: () => {
+                q.tipo = v;
+                if (v === 'multipla' && !q.alternativas.length) q.alternativas = ['', ''];
+                desenhar();
+                mudou();
+              },
+            }),
+          ),
+        );
+        const remover = el('div', { class: 'confirmar' });
+        function botaoRemover() {
+          remover.textContent = '';
+          if (aberto.quiz.length > 1)
+            remover.append(
+              el('button', {
+                type: 'button',
+                class: 'botao pequeno discreto',
+                text: 'Remover pergunta',
+                onclick: () => {
+                  remover.textContent = '';
+                  remover.append(
+                    el('span', { text: 'Remover esta pergunta?' }),
+                    el('button', {
+                      type: 'button',
+                      class: 'botao pequeno perigo',
+                      text: 'Remover',
+                      onclick: () => {
+                        aberto.quiz.splice(i, 1);
+                        desenhar();
+                        mudou();
+                      },
+                    }),
+                    el('button', { type: 'button', class: 'botao pequeno discreto', text: 'Cancelar', onclick: botaoRemover }),
+                  );
+                },
+              }),
+            );
+        }
+        botaoRemover();
+        caixa.append(
+          el(
+            'div',
+            { class: 'pergunta' },
+            el('div', { class: 'pergunta-topo' }, el('strong', { text: `Pergunta ${i + 1}` }), tipo),
+            el('div', { class: 'campo' }, el('label', { for: `q-${i}-pergunta`, text: 'Pergunta' }), pergunta),
+            el(
+              'div',
+              { class: 'campo' },
+              el('label', { for: `q-${i}-resposta`, text: q.tipo === 'multipla' ? 'Resposta certa' : 'Resposta esperada' }),
+              el('div', { class: 'linha-item' }, el('span', { class: 'marca certa', text: '✓' }), resposta),
+            ),
+            q.tipo === 'multipla'
+              ? el(
+                  'div',
+                  { class: 'campo' },
+                  el('span', { class: 'rotulo', text: 'Alternativas erradas' }),
+                  listaTextos(q.alternativas, {
+                    idBase: `q-${i}-alt`,
+                    marca: () => el('span', { class: 'marca errada', text: '✕' }),
+                    placeholder: 'Um diagnóstico parecido, que confunde',
+                    rotuloAdicionar: '+ Outra alternativa',
+                  }),
+                  el('small', { text: 'O site embaralha a ordem para o aluno. Use 2 a 4 alternativas plausíveis.' }),
+                )
+              : el('small', { class: 'campo', text: 'O aluno escreve a resposta, compara com a sua e marca se acertou.' }),
+            el('div', { class: 'campo' }, el('label', { for: `q-${i}-explicacao`, text: 'Explicação' }), explicacao),
+            remover,
+          ),
+        );
+      });
+      if (aberto.quiz.length < 4)
+        caixa.append(
+          el('button', {
+            type: 'button',
+            class: 'adicionar',
+            text: '+ Nova pergunta',
+            onclick: () => {
+              aberto.quiz.push({ tipo: 'multipla', pergunta: '', resposta: '', alternativas: ['', ''], explicacao: '' });
+              desenhar();
+              mudou();
+            },
+          }),
+        );
+    }
+    desenhar();
+    return caixa;
+  }
+
+  function atualizarFalta() {
+    const caixa = $('falta');
+    if (!caixa || !aberto) return;
+    const falta = oQueFalta(aberto);
+    caixa.textContent = '';
+    caixa.classList.toggle('ok', !falta.length);
+    if (!falta.length) caixa.append('Ficha completa. Quando estiver revisada, marque como "Pronta para publicar".');
+    else caixa.append(el('strong', { text: 'Falta preencher: ' }), falta.join(', ') + '.');
+  }
+
+  function desenharCabeca() {
+    const cab = $('cabeca');
+    if (!cab) return;
+    const url = miniaturaUrl(aberto);
+    cab.textContent = '';
+    cab.append(
+      el('span', { class: 'mini' + (url ? '' : ' vazia'), style: url ? `background-image:url("${url}")` : null, title: url ? '' : 'Lâmina ainda não convertida' }),
+      el(
+        'div',
+        { class: 'cabeca-texto' },
+        el('span', { class: 'codigo', text: aberto.codigo }),
+        el('h2', { text: aberto.diagnostico.trim() || 'Caso sem diagnóstico ainda' }),
+        el(
+          'div',
+          { class: 'linha-status' },
+          el('span', { class: 'selo ' + aberto.situacao, text: nomeSituacao(aberto.situacao) }),
+          aberto.arquivo ? el('span', { text: 'Arquivo: ' + aberto.arquivo }) : null,
+          el('span', { id: 'salvo', text: estadoSalvo }),
+        ),
+      ),
+    );
+  }
+
+  function desenharFicha() {
+    const ficha = $('ficha');
+    ficha.textContent = '';
+    if (!aberto) {
+      ficha.append(el('div', { class: 'vazio-ficha' }, el('h2', { text: 'Escolha um caso' }), el('p', { text: 'Ou crie um novo. Tudo o que você escreve é salvo sozinho.' })));
+      return;
+    }
+    const campoDiag = campoTexto('Diagnóstico', 'diagnostico', { placeholder: 'Ex.: Carcinoma de células escamosas bem diferenciado' });
+    campoDiag.querySelector('input').addEventListener('input', desenharCabeca);
+
+    const excluir = el('div', { class: 'confirmar' });
+    function botaoExcluir() {
+      excluir.textContent = '';
+      excluir.append(
+        el('button', {
+          type: 'button',
+          class: 'botao pequeno discreto',
+          text: 'Excluir caso',
+          onclick: () => {
+            excluir.textContent = '';
+            excluir.append(
+              el('span', { text: `Excluir ${aberto.codigo} e tudo o que foi escrito nele?` }),
+              el('button', { type: 'button', class: 'botao pequeno perigo', text: 'Excluir', onclick: excluirCaso }),
+              el('button', { type: 'button', class: 'botao pequeno discreto', text: 'Cancelar', onclick: botaoExcluir }),
+            );
+          },
+        }),
+      );
+    }
+    botaoExcluir();
+
+    ficha.append(
+      el(
+        'div',
+        { class: 'ficha-miolo' },
+        el('button', { type: 'button', class: 'botao pequeno discreto voltar', text: '← Casos', onclick: fechar }),
+        el('div', { class: 'cabeca', id: 'cabeca' }),
+        el('div', { class: 'falta', id: 'falta', role: 'status' }),
+
+        el(
+          'section',
+          { class: 'bloco' },
+          el('header', {}, el('h3', { text: 'O animal' }), el('p', { text: 'O que o aluno lê antes de examinar a lâmina. Não coloque nome do animal, do tutor nem da clínica.' })),
+          campoTexto('Espécie', 'especie', { sugestoes: ESPECIES, placeholder: 'Escolha acima ou escreva' }),
+          el('div', { class: 'grade3' }, campoTexto('Raça', 'raca', { placeholder: 'Ex.: SRD' }), campoTexto('Idade', 'idade', { placeholder: 'Ex.: 9 anos' }), campoTexto('Sexo', 'sexo', { placeholder: 'Ex.: Fêmea castrada' })),
+          campoTexto('Histórico clínico', 'historico', { linhas: 3, placeholder: 'Ex.: Nódulo cutâneo em membro torácico, de crescimento rápido, ulcerado. Excisão cirúrgica.' }),
+        ),
+
+        el(
+          'section',
+          { class: 'bloco' },
+          el('header', {}, el('h3', { text: 'A lâmina' })),
+          campoTexto('Órgão ou tecido', 'orgao', { sugestoes: ORGAOS, placeholder: 'Escolha acima ou escreva' }),
+          campoTexto('Coloração', 'coloracao', { sugestoes: COLORACOES }),
+          campoTexto('Arquivo do Microview', 'arquivo', { placeholder: 'Ex.: P3834-26 panorama', dica: 'Só para vocês saberem qual arquivo é. Não aparece no site.' }),
+        ),
+
+        el(
+          'section',
+          { class: 'bloco' },
+          el('header', {}, el('h3', { text: 'Diagnóstico' }), el('p', { text: 'Fica escondido do aluno até ele terminar o quiz.' })),
+          campoDiag,
+          campoTexto('Categoria', 'categoria', { sugestoes: CATEGORIAS, placeholder: 'Escolha acima ou escreva' }),
+          el(
+            'div',
+            { class: 'campo' },
+            el('span', { class: 'rotulo', text: 'Diagnósticos diferenciais' }),
+            listaTextos(aberto.diferenciais, { idBase: 'dif', placeholder: 'Ex.: Tricoepitelioma', rotuloAdicionar: '+ Diferencial' }),
+          ),
+          segmentos(
+            'Dificuldade',
+            'dificuldade',
+            DIFICULDADES.map((d) => [d, d]),
+          ),
+        ),
+
+        el(
+          'section',
+          { class: 'bloco' },
+          el('header', {}, el('h3', { text: 'O que procurar na lâmina' }), el('p', { text: 'Os achados que o aluno deve encontrar. Um por linha; Enter cria a próxima.' })),
+          listaTextos(aberto.achados, {
+            idBase: 'achado',
+            marca: (i) => el('span', { class: 'marca', text: String(i + 1) }),
+            placeholder: (i) => (i === 0 ? 'Ex.: Ninhos de queratinócitos atípicos invadindo a derme' : 'Outro achado'),
+            rotuloAdicionar: '+ Achado',
+          }),
+        ),
+
+        el('section', { class: 'bloco' }, el('header', {}, el('h3', { text: 'Quiz' }), el('p', { text: 'De 1 a 4 perguntas. A primeira costuma ser o diagnóstico.' })), blocoQuiz()),
+
+        el(
+          'section',
+          { class: 'bloco' },
+          el('header', {}, el('h3', { text: 'Comentário do patologista' }), el('p', { text: 'Aparece no fim, junto com o diagnóstico: as dicas que você daria ao lado do microscópio.' })),
+          campoTexto('Comentário', 'comentario', { linhas: 5, placeholder: 'Ex.: Repare na transição abrupta entre epitélio normal e neoplásico…' }),
+        ),
+
+        el(
+          'section',
+          { class: 'bloco' },
+          el('header', {}, el('h3', { text: 'Revisão' })),
+          el('div', { class: 'grade2' }, campoTexto('Revisado por', 'revisadoPor', { placeholder: 'Nome de quem revisou' }), segmentos('Situação', 'situacao', SITUACOES)),
+          excluir,
+        ),
+      ),
+    );
+    desenharCabeca();
+    atualizarFalta();
+  }
+
+  async function excluirCaso() {
+    const codigo = aberto.codigo;
+    clearTimeout(timerSalvar);
+    timerSalvar = null;
+    try {
+      await salvando;
+      await db.collection('casos').doc(codigo).delete();
+      casos.delete(codigo);
+      aberto = null;
+      document.getElementById('app').classList.remove('aberta');
+      desenharLista();
+      desenharFicha();
+    } catch {
+      marcarStatus('Não foi possível excluir agora. Tente de novo.');
+    }
+  }
+
+  function abrir(codigo) {
+    if (aberto && timerSalvar) salvarAgora();
+    const c = casos.get(codigo);
+    if (!c) return;
+    aberto = completar(c);
+    estadoSalvo = c.atualizadoEm ? 'Salvo em ' + new Date(c.atualizadoEm).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '';
+    document.getElementById('app').classList.add('aberta');
+    desenharLista();
+    desenharFicha();
+    $('ficha').scrollTop = 0;
+  }
+  function fechar() {
+    if (timerSalvar) salvarAgora();
+    document.getElementById('app').classList.remove('aberta');
+  }
+
+  function proximoCodigo() {
+    let maior = 0;
+    for (const k of casos.keys()) {
+      const n = Number((k.match(/(\d+)$/) || [])[1] || 0);
+      if (n > maior) maior = n;
+    }
+    return 'CASO-' + String(maior + 1).padStart(3, '0');
+  }
+
+  $('novo').addEventListener('click', async () => {
+    if (!db) return;
+    const codigo = proximoCodigo();
+    const novo = { ...casoVazio(codigo), atualizadoEm: new Date().toISOString() };
+    casos.set(codigo, novo);
+    abrir(codigo);
+    salvarAgora();
+  });
+  $('busca').addEventListener('input', desenharLista);
+
+  (async () => {
+    db = await claude.use('db');
+    if (!db) {
+      $('contagem').textContent = 'Abra esta página logado na sua conta do Claude para ver e editar as fichas.';
+      $('novo').disabled = true;
+      return;
+    }
+    db.collection('casos').onSnapshot(
+      (snap) => {
+        casos = new Map(snap.docs.map((d) => [d.id, d.data()]));
+        desenharLista();
+        if (!aberto) return;
+        const remoto = casos.get(aberto.codigo);
+        if (!remoto) {
+          if (!timerSalvar) {
+            aberto = null;
+            desenharFicha();
+          }
+          return;
+        }
+        // Mudança feita por outra pessoa: só redesenha se ninguém está digitando aqui agora.
+        const editandoAqui = timerSalvar || Date.now() - ultimaEdicao < 4000;
+        if (!editandoAqui && semData(completar(remoto)) !== semData(aberto)) {
+          aberto = completar(remoto);
+          estadoSalvo = 'Atualizado por outra pessoa às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          desenharFicha();
+        }
+      },
+      () => {
+        $('contagem').textContent = 'A lista parou de atualizar. Recarregue a página.';
+      },
+    );
+  })();
+  window.addEventListener('beforeunload', () => {
+    if (timerSalvar) salvarAgora();
+  });
+</script>
