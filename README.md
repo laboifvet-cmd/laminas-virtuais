@@ -12,10 +12,11 @@ O plano completo (fases, arquitetura, custos e cuidados) está em
 | Pasta | Conteúdo |
 | --- | --- |
 | `ferramentas/` | Conversor da lâmina do Microview para Deep Zoom |
-| `prototipo/` | Visualizador de teste, com anotações do aluno |
+| `site/` | Site de demonstração: início, catálogo e página da lâmina com quiz e anotações |
+| `prototipo/` | Primeiro visualizador de teste (substituído pelo `site/`) |
 | `tests/` | Testes automáticos |
 | `docs/` | Plano e decisões do projeto |
-| `amostras/` | Lâminas convertidas para teste local (fora do Git) |
+| `amostras/`, `site/laminas/` | Lâminas convertidas para teste local (fora do Git) |
 
 ## Converter uma lâmina
 
@@ -26,14 +27,31 @@ python ferramentas/converter_lamina.py "P3841-26_..._lamina_virtual.html" amostr
   --codigo CASO-001 --titulo "Carcinoma de células escamosas, pele, cão"
 ```
 
-Opções úteis: `--um-por-pixel 0.65` (calibração, liga a barra de escala) e
-`--objetiva 10`.
+Opções úteis: `--um-por-pixel 0.65` (calibração, liga a barra de escala),
+`--objetiva 10` e `--bloco 1024` ou `--bloco 2048` (blocos maiores, com bem
+menos arquivos; o padrão 512 copia os blocos do Microview sem recomprimir).
 
 O conversor gera `amostras/CASO-001.dzi`, a pasta `CASO-001_files/` com os
-blocos e `CASO-001.json` com a ficha do caso. O título original e a data não são
+blocos, `CASO-001.json` com a ficha do caso e `CASO-001_miniatura.jpeg` para o
+catálogo. O título original e a data não são
 copiados, para não expor o número do caso no laboratório.
 
-## Ver o protótipo
+## Ver o site de demonstração
+
+Cada lâmina vai para `site/laminas/<código>/`, e o catálogo fica em
+`site/dados/casos.json`:
+
+```bash
+python ferramentas/converter_lamina.py lamina.html site/laminas/CASO-001 --codigo CASO-001 --bloco 1024
+python ferramentas/casos_da_planilha.py fichas.csv site/dados/casos.json
+cd site && python -m http.server 8000
+```
+
+Abra <http://localhost:8000/>. O `fichas.csv` é a planilha "Fichas dos casos"
+baixada do Google Sheets como CSV. Só entram os casos marcados "Sim" em
+"Pronto para publicar?" (use `--todos` para ver todos).
+
+## Ver o protótipo antigo
 
 ```bash
 python -m http.server 8000

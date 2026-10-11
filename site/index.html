@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Banco de Lâminas IFVET</title>
+    <meta name="description" content="Lâminas inteiras de patologia veterinária para treinar o olho: navegue, anote e teste seu diagnóstico." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,650&family=Public+Sans:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="estilo.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+  </head>
+  <body>
+    <div class="aviso-demo">Versão de demonstração: ainda sem cadastro e sem cobrança. Suas anotações ficam só neste navegador.</div>
+    <header class="topo">
+      <a class="marca" href="#inicio" aria-label="Início">
+        <span class="marca-lamina" aria-hidden="true"></span>
+        <span>Banco de Lâminas <strong>IFVET</strong></span>
+      </a>
+      <nav class="menu">
+        <a href="#laminas" data-rota="laminas">Lâminas</a>
+        <a href="#planos" data-rota="planos">Planos</a>
+        <button class="botao botao-contorno" id="entrar" type="button" title="O cadastro entra na próxima etapa">Entrar</button>
+      </nav>
+    </header>
+    <main id="app"></main>
+    <footer class="rodape">
+      <span>IFVET · Patologia Diagnóstica</span>
+      <span>Material de estudo. Casos sem identificação de animal, tutor ou clínica.</span>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

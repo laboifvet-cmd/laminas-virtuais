@@ -8,6 +8,13 @@ sobreposição, cada nível com metade do anterior), então são copiados byte a
 byte, sem recompressão e sem perda de qualidade. Só os níveis muito pequenos,
 que o Microview não gera, são produzidos aqui a partir do menor nível.
 
+Com --bloco 1024 ou 2048 a lâmina é recortada de novo em blocos maiores
+(com recompressão JPEG de alta qualidade). São bem menos arquivos, o que
+facilita enviar e guardar; a contrapartida é baixar um pouco mais de imagem
+de cada vez no zoom máximo.
+
+Também é gravada uma miniatura (<código>_miniatura.jpeg) para o catálogo.
+
 O título original (que traz o número do caso no laboratório) e a data NÃO são
 copiados: a lâmina recebe um código neutro, para não expor dados de paciente
 ou cliente na plataforma.
@@ -30,6 +37,8 @@ from pathlib import Path
 from PIL import Image
 
 BLOCO_DZI = 512
+BLOCOS_PERMITIDOS = (512, 1024, 2048)
+LADO_MINIATURA = 480
 CODIGO_VALIDO = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 
 
@@ -82,9 +91,38 @@ def montar_nivel(nivel):
     return img
 
 
-def converter(caminho_html, pasta_saida, codigo, titulo="", um_por_pixel=None, objetiva=None, qualidade=88):
+def gravar_blocos(img, destino, bloco, qualidade):
+    destino.mkdir()
+    w, h = img.size
+    for c in range(math.ceil(w / bloco)):
+        for r in range(math.ceil(h / bloco)):
+            recorte = img.crop((c * bloco, r * bloco, min(w, c * bloco + bloco), min(h, r * bloco + bloco)))
+            recorte.save(destino / f"{c}_{r}.jpeg", "JPEG", quality=qualidade)
+
+
+def recortar_de_novo(niveis, largura, altura, maximo, pasta_blocos, bloco, qualidade):
+    """Monta a imagem em resolução total e refaz a pirâmide com blocos maiores."""
+    img = montar_nivel(niveis[0])
+    for n in range(maximo, -1, -1):
+        tamanho = dimensoes_dzi(largura, altura, n, maximo)
+        if img.size != tamanho:
+            img = img.resize(tamanho, Image.LANCZOS)
+        gravar_blocos(img, pasta_blocos / str(n), bloco, qualidade)
+
+
+def gravar_miniatura(niveis, destino):
+    # Menor nível que ainda tenha o lado maior da miniatura, para não ampliar.
+    nivel = next((nv for nv in reversed(niveis) if max(nv["w"], nv["h"]) >= LADO_MINIATURA), niveis[0])
+    img = montar_nivel(nivel)
+    img.thumbnail((LADO_MINIATURA, LADO_MINIATURA), Image.LANCZOS)
+    img.save(destino, "JPEG", quality=85)
+
+
+def converter(caminho_html, pasta_saida, codigo, titulo="", um_por_pixel=None, objetiva=None, qualidade=88, bloco=BLOCO_DZI):
     if not CODIGO_VALIDO.match(codigo):
         raise ErroConversao("Código inválido: use só letras, números, hífen e sublinhado (ex.: CASO-001).")
+    if bloco not in BLOCOS_PERMITIDOS:
+        raise ErroConversao(f"Tamanho de bloco deve ser um destes: {', '.join(map(str, BLOCOS_PERMITIDOS))}.")
     dados = ler_dados(caminho_html)
     largura, altura = dados["largura"], dados["altura"]
     maximo = nivel_maximo(largura, altura)
@@ -98,12 +136,31 @@ def converter(caminho_html, pasta_saida, codigo, titulo="", um_por_pixel=None, o
 
     # Níveis do Microview: índice 0 = resolução total = nível DZI máximo.
     for i, nivel in enumerate(niveis):
-        n = maximo - i
-        esperado = dimensoes_dzi(largura, altura, n, maximo)
+        esperado = dimensoes_dzi(largura, altura, maximo - i, maximo)
         if (nivel["w"], nivel["h"]) != esperado:
             raise ErroConversao(f"Nível {i} com {nivel['w']}×{nivel['h']}, esperado {esperado[0]}×{esperado[1]}.")
         if len(nivel["b"]) != nivel["c"] * nivel["r"]:
             raise ErroConversao(f"Nível {i} com número de blocos incoerente.")
+
+    if bloco != BLOCO_DZI:
+        recortar_de_novo(niveis, largura, altura, maximo, pasta_blocos, bloco, qualidade=90)
+    else:
+        copiar_blocos(niveis, maximo, pasta_blocos, largura, altura, qualidade)
+    gravar_miniatura(niveis, saida / f"{codigo}_miniatura.jpeg")
+
+    (saida / f"{codigo}.dzi").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        f'<Image xmlns="http://schemas.microsoft.com/deepzoom/2008" TileSize="{bloco}" Overlap="0" Format="jpeg">\n'
+        f'  <Size Width="{largura}" Height="{altura}"/>\n'
+        "</Image>\n",
+        encoding="utf-8",
+    )
+    return gravar_ficha(dados, saida, codigo, titulo, um_por_pixel, objetiva)
+
+
+def copiar_blocos(niveis, maximo, pasta_blocos, largura, altura, qualidade):
+    for i, nivel in enumerate(niveis):
+        n = maximo - i
         destino = pasta_blocos / str(n)
         destino.mkdir()
         for r in range(nivel["r"]):
@@ -125,14 +182,8 @@ def converter(caminho_html, pasta_saida, codigo, titulo="", um_por_pixel=None, o
             destino.mkdir()
             reduzida.save(destino / "0_0.jpeg", "JPEG", quality=qualidade)
 
-    (saida / f"{codigo}.dzi").write_text(
-        '<?xml version="1.0" encoding="UTF-8"?>\n'
-        f'<Image xmlns="http://schemas.microsoft.com/deepzoom/2008" TileSize="{BLOCO_DZI}" Overlap="0" Format="jpeg">\n'
-        f'  <Size Width="{largura}" Height="{altura}"/>\n'
-        "</Image>\n",
-        encoding="utf-8",
-    )
 
+def gravar_ficha(dados, saida, codigo, titulo, um_por_pixel, objetiva):
     # Pinos (fotos de maior aumento presas a um ponto da lâmina) viram arquivos à parte.
     pinos = []
     pasta_pinos = saida / f"{codigo}_pinos"
@@ -150,11 +201,12 @@ def converter(caminho_html, pasta_saida, codigo, titulo="", um_por_pixel=None, o
     ficha = {
         "codigo": codigo,
         "titulo": titulo,
-        "largura": largura,
-        "altura": altura,
+        "largura": dados["largura"],
+        "altura": dados["altura"],
         "umPorPixel": um_por_pixel if um_por_pixel is not None else dados.get("umPorPixel"),
         "objetiva": objetiva if objetiva is not None else (dados.get("objetiva") or ""),
         "dzi": f"{codigo}.dzi",
+        "miniatura": f"{codigo}_miniatura.jpeg",
         "pinos": pinos,
     }
     (saida / f"{codigo}.json").write_text(json.dumps(ficha, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -169,9 +221,10 @@ def principal(argv=None):
     ap.add_argument("--titulo", default="", help="título exibido ao aluno (sem dados do paciente)")
     ap.add_argument("--um-por-pixel", type=float, help="calibração em µm por pixel da resolução total")
     ap.add_argument("--objetiva", help="aumento da objetiva usada na captura (ex.: 10)")
+    ap.add_argument("--bloco", type=int, default=BLOCO_DZI, choices=BLOCOS_PERMITIDOS, help="tamanho dos blocos em px (padrão 512, sem recompressão)")
     args = ap.parse_args(argv)
     try:
-        ficha = converter(args.html, args.saida, args.codigo, args.titulo, args.um_por_pixel, args.objetiva)
+        ficha = converter(args.html, args.saida, args.codigo, args.titulo, args.um_por_pixel, args.objetiva, bloco=args.bloco)
     except ErroConversao as e:
         print(f"Erro: {e}", file=sys.stderr)
         return 1

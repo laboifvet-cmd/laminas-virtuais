@@ -1,0 +1,29 @@
+[
+  {
+    "codigo": "CASO-001",
+    "exemplo": true,
+    "especie": "A definir",
+    "orgao": "A definir",
+    "categoria": "",
+    "coloracao": "HE",
+    "dificuldade": "Médio",
+    "diagnostico": "Diagnóstico de exemplo (o patologista preenche na planilha)",
+    "achados": [
+      "Achado de exemplo 1: o que o aluno deve encontrar no aumento menor",
+      "Achado de exemplo 2: o detalhe que confirma o diagnóstico"
+    ],
+    "quiz": [
+      {
+        "pergunta": "Pergunta de exemplo, de múltipla escolha: qual o diagnóstico?",
+        "resposta": "Alternativa certa (exemplo)",
+        "alternativas": ["Alternativa errada A (exemplo)", "Alternativa errada B (exemplo)", "Alternativa errada C (exemplo)"]
+      },
+      {
+        "pergunta": "Pergunta de exemplo, aberta: descreva o que você vê na superfície do fragmento.",
+        "resposta": "Resposta de exemplo. Aqui entra o que o patologista espera que o aluno tenha visto.",
+        "alternativas": []
+      }
+    ],
+    "comentario": "Comentário de exemplo do patologista, mostrado depois do quiz."
+  }
+]

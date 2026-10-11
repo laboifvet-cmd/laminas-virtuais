@@ -73,6 +73,32 @@ class ConverterLaminaTest(unittest.TestCase):
                     with Image.open(pasta / str(n) / f"{c}_{r}.jpeg") as img:
                         self.assertEqual(img.size, (min(512, w - c * 512), min(512, h - r * 512)))
 
+    def test_blocos_maiores_recortam_de_novo(self):
+        html, _ = lamina_falsa(largura=2300, altura=1300)
+        cv.converter(self.gravar(html), self.dir / "saida", "CASO-002", bloco=1024)
+        pasta = self.dir / "saida" / "CASO-002_files"
+        maximo = math.ceil(math.log2(2300))
+        self.assertIn('TileSize="1024"', (self.dir / "saida" / "CASO-002.dzi").read_text())
+        for n in range(maximo + 1):
+            w, h = cv.dimensoes_dzi(2300, 1300, n, maximo)
+            arquivos = sorted(p.name for p in (pasta / str(n)).iterdir())
+            self.assertEqual(len(arquivos), math.ceil(w / 1024) * math.ceil(h / 1024))
+            for c in range(math.ceil(w / 1024)):
+                for r in range(math.ceil(h / 1024)):
+                    with Image.open(pasta / str(n) / f"{c}_{r}.jpeg") as img:
+                        self.assertEqual(img.size, (min(1024, w - c * 1024), min(1024, h - r * 1024)))
+
+    def test_recusa_bloco_fora_do_padrao(self):
+        html, _ = lamina_falsa()
+        with self.assertRaises(cv.ErroConversao):
+            cv.converter(self.gravar(html), self.dir / "saida", "CASO-001", bloco=700)
+
+    def test_grava_miniatura(self):
+        html, _ = lamina_falsa(largura=1100, altura=700)
+        ficha = cv.converter(self.gravar(html), self.dir / "saida", "CASO-001")
+        with Image.open(self.dir / "saida" / ficha["miniatura"]) as img:
+            self.assertEqual(max(img.size), cv.LADO_MINIATURA)
+
     def test_copia_blocos_sem_recomprimir(self):
         html, dados = lamina_falsa()
         cv.converter(self.gravar(html), self.dir / "saida", "CASO-001")
@@ -94,7 +120,7 @@ class ConverterLaminaTest(unittest.TestCase):
     def test_nao_leva_numero_do_caso_nem_data(self):
         html, _ = lamina_falsa(titulo="P3841-26 · panorama")
         cv.converter(self.gravar(html), self.dir / "saida", "CASO-001")
-        for arq in (self.dir / "saida").glob("*.*"):
+        for arq in [*(self.dir / "saida").glob("*.json"), *(self.dir / "saida").glob("*.dzi")]:
             texto = arq.read_text(encoding="utf-8")
             self.assertNotIn("P3841", texto)
             self.assertNotIn("09/10/2026", texto)

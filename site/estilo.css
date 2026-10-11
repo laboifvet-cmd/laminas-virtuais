@@ -1,0 +1,792 @@
+/* Cores tiradas da própria coloração HE: hematoxilina (roxo dos núcleos) como cor principal e eosina (rosa do
+   citoplasma) como destaque. O visualizador fica sempre escuro, como a sala do microscópio. */
+:root {
+  --fundo: #f7f5fa;
+  --superficie: #ffffff;
+  --texto: #1f1a2b;
+  --suave: #625a73;
+  --linha: #e3dded;
+  --hematoxilina: #4b2e83;
+  --hematoxilina-suave: #ece6f7;
+  --eosina: #b8336a;
+  --eosina-suave: #fbe7ef;
+  --certo: #2f7d4f;
+  --certo-suave: #e3f3e9;
+  --errado: #b3261e;
+  --errado-suave: #fbe9e7;
+  --visor: #1b1922;
+  --visor-painel: #24212d;
+  --visor-texto: #ece8f3;
+  --visor-suave: #a8a0b8;
+  --visor-linha: #ffffff1f;
+  --nota: #ffcf33;
+
+  --fonte-titulo: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --fonte-texto: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --fonte-dado: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --raio: 10px;
+  --gutter: clamp(16px, 4vw, 40px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --fundo: #15131b;
+    --superficie: #1f1c27;
+    --texto: #ece8f3;
+    --suave: #a8a0b8;
+    --linha: #322d3d;
+    --hematoxilina: #a58cf0;
+    --hematoxilina-suave: #2b2540;
+    --eosina: #ec8fb6;
+    --eosina-suave: #3a2230;
+    --certo: #6cc58f;
+    --certo-suave: #1d3326;
+    --errado: #f2948c;
+    --errado-suave: #3b1f1d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --fundo: #15131b;
+  --superficie: #1f1c27;
+  --texto: #ece8f3;
+  --suave: #a8a0b8;
+  --linha: #322d3d;
+  --hematoxilina: #a58cf0;
+  --hematoxilina-suave: #2b2540;
+  --eosina: #ec8fb6;
+  --eosina-suave: #3a2230;
+  --certo: #6cc58f;
+  --certo-suave: #1d3326;
+  --errado: #f2948c;
+  --errado-suave: #3b1f1d;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+html {
+  height: 100%;
+}
+body {
+  min-height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--fundo);
+  color: var(--texto);
+  font: 16px/1.55 var(--fonte-texto);
+}
+h1,
+h2,
+h3 {
+  font-family: var(--fonte-titulo);
+  font-weight: 650;
+  line-height: 1.15;
+  text-wrap: balance;
+  margin: 0;
+}
+a {
+  color: var(--hematoxilina);
+}
+img {
+  max-width: 100%;
+}
+:focus-visible {
+  outline: 2px solid var(--eosina);
+  outline-offset: 2px;
+}
+
+/* ---------- Estrutura ---------- */
+.aviso-demo {
+  padding: 6px var(--gutter);
+  background: var(--hematoxilina-suave);
+  color: var(--texto);
+  font-size: 13px;
+  text-align: center;
+}
+.topo {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px var(--gutter);
+  background: var(--superficie);
+  border-bottom: 1px solid var(--linha);
+}
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--texto);
+  text-decoration: none;
+  font-family: var(--fonte-titulo);
+  font-size: 20px;
+}
+.marca strong {
+  color: var(--hematoxilina);
+}
+/* Lâmina de vidro em miniatura: 75 × 25 mm, com a etiqueta fosca à esquerda e o corte rosado. */
+.marca-lamina {
+  width: 36px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid var(--linha);
+  background: linear-gradient(90deg, var(--linha) 0 30%, transparent 30%),
+    radial-gradient(ellipse 30% 40% at 66% 50%, var(--eosina) 0 60%, transparent 62%), var(--hematoxilina-suave);
+}
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.menu a {
+  color: var(--suave);
+  text-decoration: none;
+  font-weight: 600;
+}
+.menu a:hover,
+.menu a[aria-current='page'] {
+  color: var(--texto);
+}
+main {
+  flex: 1;
+  min-height: 0;
+}
+.rodape {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 20px var(--gutter);
+  border-top: 1px solid var(--linha);
+  color: var(--suave);
+  font-size: 13px;
+}
+/* Na lâmina, a tela inteira é do visualizador: altura fixa, sem rolar a página. */
+body.modo-lamina {
+  height: 100%;
+}
+body.modo-lamina .rodape,
+body.modo-lamina .aviso-demo {
+  display: none;
+}
+.conteudo {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+/* ---------- Botões e etiquetas ---------- */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--hematoxilina);
+  background: var(--hematoxilina);
+  color: var(--superficie);
+  font: 600 15px/1.2 var(--fonte-texto);
+  text-decoration: none;
+  cursor: pointer;
+}
+.botao:hover {
+  filter: brightness(1.08);
+}
+.botao-contorno {
+  background: transparent;
+  color: var(--hematoxilina);
+}
+.botao-pequeno {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.etiqueta {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--hematoxilina-suave);
+  color: var(--texto);
+  font: 500 12px/1.6 var(--fonte-texto);
+}
+.etiqueta.eosina {
+  background: var(--eosina-suave);
+}
+.etiqueta.certo {
+  background: var(--certo-suave);
+  color: var(--certo);
+}
+.codigo {
+  font-family: var(--fonte-dado);
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+}
+.rotulo {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--suave);
+}
+
+/* ---------- Início ---------- */
+.abertura {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: center;
+  padding-block: clamp(32px, 7vw, 88px);
+}
+.abertura h1 {
+  font-size: clamp(34px, 5.2vw, 58px);
+}
+.abertura h1 em {
+  font-style: italic;
+  color: var(--eosina);
+}
+.abertura p {
+  max-width: 34em;
+  margin: 18px 0 26px;
+  color: var(--suave);
+  font-size: 18px;
+}
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+/* A lâmina de vidro da abertura, em proporção real (75 × 26 mm). */
+.vidro {
+  position: relative;
+  aspect-ratio: 75 / 26;
+  max-width: 100%;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ffffffcc, #f1eef7aa);
+  border: 1px solid var(--linha);
+  box-shadow: 0 24px 50px -24px #4b2e8366;
+  display: grid;
+  grid-template-columns: 28% 1fr;
+  overflow: hidden;
+  transform: rotate(-4deg);
+}
+.vidro-etiqueta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px;
+  background: repeating-linear-gradient(45deg, #e9e5ef, #e9e5ef 3px, #e2dde9 3px, #e2dde9 6px);
+  color: #2b2438;
+  font-family: var(--fonte-dado);
+  font-size: clamp(9px, 1.3vw, 12px);
+  line-height: 1.3;
+}
+.vidro-etiqueta strong {
+  font-family: var(--fonte-titulo);
+  font-size: 1.35em;
+}
+.vidro-corte {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 5%;
+}
+.vidro-corte img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+.secao {
+  padding-block: clamp(36px, 6vw, 72px);
+  border-top: 1px solid var(--linha);
+}
+.secao h2 {
+  font-size: clamp(26px, 3.4vw, 36px);
+  margin-bottom: 24px;
+}
+.passos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
+}
+.passos li {
+  counter-increment: passo;
+  display: grid;
+  gap: 6px;
+}
+.passos li::before {
+  content: counter(passo);
+  font: 650 34px/1 var(--fonte-titulo);
+  color: var(--eosina);
+}
+.passos h3 {
+  font-size: 21px;
+}
+.passos p {
+  margin: 0;
+  color: var(--suave);
+}
+.publico {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.publico .etiqueta {
+  font-size: 14px;
+  padding: 6px 14px;
+}
+.planos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  max-width: 760px;
+}
+.plano {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 24px;
+  border-radius: var(--raio);
+  background: var(--superficie);
+  border: 1px solid var(--linha);
+}
+.plano.destaque {
+  border-color: var(--hematoxilina);
+}
+.plano h3 {
+  font-size: 24px;
+}
+.plano .preco {
+  font: 600 28px/1.2 var(--fonte-titulo);
+}
+.plano .preco small {
+  font: 400 14px var(--fonte-texto);
+  color: var(--suave);
+}
+.plano ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--suave);
+}
+
+/* ---------- Catálogo ---------- */
+.catalogo-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 32px 20px;
+}
+.catalogo-topo h1 {
+  font-size: clamp(30px, 4vw, 42px);
+}
+.catalogo-topo p {
+  margin: 6px 0 0;
+  color: var(--suave);
+}
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.filtros label {
+  display: grid;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--suave);
+}
+.filtros select {
+  min-width: 140px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--linha);
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-size: 15px;
+}
+.grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 20px;
+  padding-bottom: 48px;
+}
+.cartao {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-radius: var(--raio);
+  overflow: hidden;
+  background: var(--superficie);
+  border: 1px solid var(--linha);
+  color: var(--texto);
+  text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.cartao:hover {
+  border-color: var(--hematoxilina);
+  transform: translateY(-2px);
+}
+.cartao-imagem {
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border-bottom: 1px solid var(--linha);
+}
+.cartao-imagem {
+  position: relative;
+  overflow: hidden;
+}
+.cartao-imagem img {
+  position: absolute;
+  inset: 4%;
+  width: 92%;
+  height: 92%;
+  object-fit: contain;
+}
+.cartao-corpo {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 14px 16px 16px;
+}
+.cartao-corpo h3 {
+  font-size: 20px;
+}
+.cartao-corpo .detalhe {
+  color: var(--suave);
+  font-size: 14px;
+}
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.vazio {
+  padding: 40px 0;
+  color: var(--suave);
+}
+
+/* ---------- Página da lâmina ---------- */
+.lamina {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--visor);
+  color: var(--visor-texto);
+}
+.lamina-barra {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 14px;
+  background: var(--visor-painel);
+  border-bottom: 1px solid var(--visor-linha);
+}
+.lamina-barra a {
+  color: var(--visor-suave);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.lamina-barra a:hover {
+  color: var(--visor-texto);
+}
+.lamina-barra h1 {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lamina-barra h1 small {
+  margin-left: 8px;
+  font: 400 13px var(--fonte-texto);
+  color: var(--visor-suave);
+}
+.ferramentas {
+  display: flex;
+  gap: 8px;
+}
+.ferramenta {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ffffff38;
+  background: #2d2a38;
+  color: #fff;
+  font: 600 13px var(--fonte-texto);
+  cursor: pointer;
+}
+.ferramenta:hover {
+  background: #3a3550;
+}
+.ferramenta[aria-pressed='true'] {
+  background: #7a5cff;
+  border-color: #7a5cff;
+}
+.visor {
+  position: relative;
+  min-height: 0;
+  background: #fff;
+}
+.visor.anotando {
+  cursor: crosshair;
+}
+.escala {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 5;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: #1b1922d9;
+  color: #fff;
+  font: 12px var(--fonte-dado);
+}
+.escala div {
+  height: 5px;
+  margin-bottom: 4px;
+  border-radius: 2px;
+  background: #fff;
+}
+.marcador {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--nota);
+  color: #1b1922;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px #0008;
+  font: 700 11px/18px var(--fonte-texto);
+  text-align: center;
+  cursor: pointer;
+}
+.marcador.pino {
+  background: #7a5cff;
+  color: #fff;
+}
+.painel {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--visor-painel);
+  border-left: 1px solid var(--visor-linha);
+}
+.abas {
+  display: flex;
+  border-bottom: 1px solid var(--visor-linha);
+}
+.abas button {
+  flex: 1;
+  padding: 12px 6px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--visor-suave);
+  font: 600 14px var(--fonte-texto);
+  cursor: pointer;
+}
+.abas button[aria-selected='true'] {
+  color: var(--visor-texto);
+  border-bottom-color: #ec8fb6;
+}
+.aba {
+  overflow: auto;
+  padding: 16px;
+}
+.aba p {
+  margin: 0 0 12px;
+}
+.aba .suave,
+.lamina .suave {
+  color: var(--visor-suave);
+  font-size: 14px;
+}
+.pergunta {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--visor-linha);
+}
+.pergunta h3 {
+  font: 600 16px/1.4 var(--fonte-texto);
+}
+.opcao {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--visor-linha);
+  background: #2d2a38;
+  color: var(--visor-texto);
+  font: 15px/1.35 var(--fonte-texto);
+  cursor: pointer;
+}
+.opcao:hover:not(:disabled) {
+  border-color: #a58cf0;
+}
+.opcao:disabled {
+  cursor: default;
+}
+.opcao.certa {
+  border-color: #6cc58f;
+  background: #1d3326;
+}
+.opcao.errada {
+  border-color: #f2948c;
+  background: #3b1f1d;
+}
+.resultado {
+  font-weight: 600;
+}
+.resultado.certo {
+  color: #6cc58f;
+}
+.resultado.errado {
+  color: #f2948c;
+}
+.campo {
+  width: 100%;
+  min-height: 64px;
+  resize: vertical;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--visor-linha);
+  background: #2d2a38;
+  color: var(--visor-texto);
+  font: 15px/1.4 var(--fonte-texto);
+}
+.resposta-aberta {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #2b2540;
+}
+.linha-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.placar {
+  padding: 14px;
+  border-radius: 8px;
+  background: #2b2540;
+  font: 600 16px var(--fonte-texto);
+}
+.nota {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: start;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--visor-linha);
+}
+.nota .ferramenta {
+  padding: 3px 9px;
+}
+.diagnostico {
+  font: 650 24px/1.2 var(--fonte-titulo);
+  margin: 4px 0 14px;
+}
+.bloqueado {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px dashed var(--visor-linha);
+}
+dl.ficha {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+dl.ficha dt {
+  color: var(--visor-suave);
+}
+dl.ficha dd {
+  margin: 0;
+}
+.aba ul {
+  margin: 0 0 14px;
+  padding-left: 20px;
+}
+dialog {
+  max-width: min(92vw, 900px);
+  color: var(--visor-texto);
+  background: var(--visor-painel);
+  border: 1px solid var(--visor-linha);
+  border-radius: var(--raio);
+}
+dialog img {
+  display: block;
+  max-height: 70vh;
+  margin-bottom: 8px;
+}
+
+.aviso-flutuante {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 12px 18px;
+  border-radius: var(--raio);
+  background: var(--texto);
+  color: var(--fundo);
+  font-size: 15px;
+  box-shadow: 0 10px 30px -10px #0006;
+}
+
+/* ---------- Telas estreitas ---------- */
+@media (max-width: 860px) {
+  .abertura,
+  .planos {
+    grid-template-columns: 1fr;
+  }
+  .passos {
+    grid-template-columns: 1fr;
+  }
+  .lamina {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 55vh minmax(0, 1fr);
+    height: auto;
+    min-height: 100%;
+  }
+  .painel {
+    border-left: 0;
+    border-top: 1px solid var(--visor-linha);
+  }
+  .lamina-barra {
+    flex-wrap: wrap;
+  }
+  .lamina-barra h1 {
+    flex-basis: 100%;
+    order: 3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cartao,
+  .cartao:hover {
+    transition: none;
+    transform: none;
+  }
+}

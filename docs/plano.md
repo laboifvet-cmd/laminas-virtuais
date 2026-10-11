@@ -11,7 +11,9 @@ Teoria e vídeos ficam para depois, se fizer sentido.
 
 - [x] Conversor da lâmina do Microview para Deep Zoom (`ferramentas/converter_lamina.py`)
 - [x] Visualizador com zoom, minimapa, pinos de maior aumento e anotações do aluno (`prototipo/`)
-- [ ] Converter 3 a 5 lâminas reais e mostrar ao colega patologista
+- [x] Site de demonstração com início, catálogo, quiz (múltipla escolha ou resposta aberta) e ficha do caso (`site/`)
+- [x] Planilha "Fichas dos casos" no Google Drive e gerador do catálogo a partir dela (`ferramentas/casos_da_planilha.py`)
+- [ ] Converter 3 a 5 lâminas reais, preencher as fichas e mostrar ao colega patologista
 
 ### Fase 1: lançamento de teste (30 a 40 lâminas)
 
@@ -74,6 +76,17 @@ Observações da primeira lâmina de teste (panorama, 9441 × 11780 px):
   (nucléolos, mitoses) pede objetiva de 20× ou 40× nas áreas de interesse. Os
   **pinos** do Microview (fotos de maior aumento presas a um ponto) já cobrem
   isso e aparecem no visualizador.
+
+## Envio das lâminas
+
+Os arquivos do Microview passam de 30 MB, mais do que o envio pela conversa
+aceita. Enquanto não há a página de envio da plataforma:
+
+- **Compactar em .zip** (no Mac, botão direito > Comprimir). O base64 dos
+  blocos encolhe cerca de 25%: a lâmina de teste foi de 30 MB para 22 MB.
+- Na plataforma, o administrador enviará as lâminas direto pelo navegador para
+  o armazenamento, sem esse limite. Uma opção melhor ainda é o próprio
+  Microview exportar no formato Deep Zoom.
 
 ## Cuidados
 

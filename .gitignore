@@ -4,3 +4,4 @@ amostras/
 __pycache__/
 .venv/
 .DS_Store
+site/laminas/
