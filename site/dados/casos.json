@@ -16,8 +16,11 @@
     "achados": [
       "Células Gigantes multinucleadas associadas a colágeno degenerado (colagenólise)"
     ],
+    "objetiva": null,
+    "umPorPixel": null,
     "quiz": [
       {
+        "tipo": "multipla",
         "pergunta": "Qual o diagnóstico?",
         "resposta": "Granuloma Eosinofílico",
         "alternativas": [
@@ -27,6 +30,7 @@
         ],
         "explicacao": ""
       }
-    ]
+    ],
+    "tour": []
   }
 ]

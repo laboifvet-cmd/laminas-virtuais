@@ -57,6 +57,26 @@ class CasosDoAppTest(unittest.TestCase):
         self.assertEqual(caso["quiz"][1]["alternativas"], [])
         self.assertEqual(caso["quiz"][1]["explicacao"], "Típico")
 
+    def test_pergunta_de_regiao_e_tour(self):
+        doc = ficha(
+            "CASO-004",
+            objetiva="10",
+            umPorPixel="0,65",
+            quiz=[
+                {"tipo": "regiao", "pergunta": "Clique numa célula gigante", "resposta": "", "regiao": {"x": 10, "y": 20, "w": 300, "h": 200}},
+                {"tipo": "regiao", "pergunta": "Sem área marcada", "resposta": ""},
+                {"tipo": "multipla", "pergunta": "Sem erradas", "resposta": "X", "alternativas": ["", " "]},
+            ],
+            tour=[{"x": 100, "y": 200, "largura": 800, "zoom": 1.5, "texto": " Colagenólise "}, {"x": 1, "y": 2, "largura": 0}],
+        )
+        self.gravar("CASO-004", doc)
+        [caso] = ca.ler_pasta(self.pasta)
+        self.assertEqual(caso["objetiva"], 10)
+        self.assertEqual(caso["umPorPixel"], 0.65)
+        self.assertEqual([q["tipo"] for q in caso["quiz"]], ["regiao", "aberta"])
+        self.assertEqual(caso["quiz"][0]["regiao"], {"x": 10, "y": 20, "w": 300, "h": 200})
+        self.assertEqual(caso["tour"], [{"x": 100, "y": 200, "zoom": 1.5, "largura": 800, "texto": "Colagenólise"}])
+
     def test_so_publica_prontas(self):
         self.gravar("CASO-001", ficha("CASO-001", situacao="rascunho"))
         self.gravar("CASO-002", ficha("CASO-002"))

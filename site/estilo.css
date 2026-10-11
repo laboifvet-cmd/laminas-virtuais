@@ -14,6 +14,9 @@
   --certo-suave: #e3f3e9;
   --errado: #b3261e;
   --errado-suave: #fbe9e7;
+  --superficie-2: #faf9fc;
+  --atencao: #8a5a00;
+  --atencao-suave: #fbf0d9;
   --visor: #1b1922;
   --visor-painel: #24212d;
   --visor-texto: #ece8f3;
@@ -43,6 +46,9 @@
     --certo-suave: #1d3326;
     --errado: #f2948c;
     --errado-suave: #3b1f1d;
+    --superficie-2: #221f2a;
+    --atencao: #f0c36a;
+    --atencao-suave: #3a2f17;
     color-scheme: dark;
   }
 }
@@ -60,11 +66,17 @@
   --certo-suave: #1d3326;
   --errado: #f2948c;
   --errado-suave: #3b1f1d;
+  --superficie-2: #221f2a;
+  --atencao: #f0c36a;
+  --atencao-suave: #3a2f17;
   color-scheme: dark;
 }
 
 * {
   box-sizing: border-box;
+}
+[hidden] {
+  display: none !important;
 }
 html {
   height: 100%;
@@ -169,11 +181,14 @@ main {
   font-size: 13px;
 }
 /* Na lâmina, a tela inteira é do visualizador: altura fixa, sem rolar a página. */
-body.modo-lamina {
+body.modo-lamina,
+body.modo-fichas {
   height: 100%;
 }
 body.modo-lamina .rodape,
-body.modo-lamina .aviso-demo {
+body.modo-lamina .aviso-demo,
+body.modo-fichas .rodape,
+body.modo-fichas .aviso-demo {
   display: none;
 }
 .conteudo {
@@ -541,30 +556,137 @@ body.modo-lamina .aviso-demo {
   background: #7a5cff;
   border-color: #7a5cff;
 }
-.visor {
+/* O OpenSeadragon põe position: relative no próprio elemento, então o visualizador ocupa a área pela grade. */
+.visor-area,
+.fx-visor-area {
   position: relative;
+  min-height: 0;
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+}
+.visor {
   min-height: 0;
   background: #fff;
 }
-.visor.anotando {
+.visor.anotando,
+.visor.respondendo {
   cursor: crosshair;
 }
-.escala {
+.visor-ferramentas {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.visor-botao {
+  min-width: 44px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #ffffff38;
+  background: #1b1922d9;
+  color: #fff;
+  font: 600 12px var(--fonte-texto);
+  cursor: pointer;
+}
+.visor-botao:hover {
+  background: #3a3550;
+}
+.visor-botao[aria-pressed='true'] {
+  background: #7a5cff;
+  border-color: #7a5cff;
+}
+.visor-ajustes {
+  position: absolute;
+  top: 10px;
+  right: 76px;
+  z-index: 7;
+  display: grid;
+  gap: 10px;
+  width: 200px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #1b1922f2;
+  color: #fff;
+  font-size: 13px;
+}
+.visor-ajustes label {
+  display: grid;
+  gap: 4px;
+}
+.visor-rodape {
   position: absolute;
   left: 12px;
   bottom: 12px;
   z-index: 5;
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  pointer-events: none;
+}
+.visor-escala,
+.visor-aumento {
   padding: 6px 9px;
   border-radius: 8px;
   background: #1b1922d9;
   color: #fff;
   font: 12px var(--fonte-dado);
 }
-.escala div {
+.visor-aumento:empty {
+  display: none;
+}
+.visor-regua {
   height: 5px;
   margin-bottom: 4px;
   border-radius: 2px;
   background: #fff;
+}
+.visor-faixa {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 76px;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #7a5cffee;
+  color: #fff;
+  font-size: 14px;
+}
+.visor-detalhe img {
+  display: block;
+  max-height: 70vh;
+  margin-bottom: 8px;
+}
+.area-marcada {
+  border: 2px dashed #ffcf33;
+  background: #ffcf3322;
+  pointer-events: none;
+}
+.area-marcada.resposta {
+  border-color: #2f9e5f;
+  background: #2f9e5f22;
+}
+.area-marcada.rascunho {
+  border-color: #7a5cff;
+  background: #7a5cff22;
+}
+.area-marcada span {
+  position: absolute;
+  top: -22px;
+  left: -2px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #2f9e5f;
+  color: #fff;
+  font: 700 11px/16px var(--fonte-texto);
+  white-space: nowrap;
 }
 .marcador {
   width: 22px;
@@ -580,6 +702,28 @@ body.modo-lamina .aviso-demo {
 }
 .marcador.pino {
   background: #7a5cff;
+  color: #fff;
+}
+.marcador.tour {
+  background: #ec8fb6;
+  color: #1b1922;
+}
+.marcador.tour.atual {
+  transform: scale(1.35);
+  box-shadow: 0 0 0 4px #ec8fb666;
+}
+.marcador.clique {
+  width: 20px;
+  height: 20px;
+  font-size: 13px;
+  line-height: 16px;
+}
+.marcador.clique.certo {
+  background: #2f9e5f;
+  color: #fff;
+}
+.marcador.clique.errado {
+  background: #d1453b;
   color: #fff;
 }
 .painel {
@@ -662,7 +806,7 @@ body.modo-lamina .aviso-demo {
 .resultado.errado {
   color: #f2948c;
 }
-.campo {
+.caixa-texto {
   width: 100%;
   min-height: 64px;
   resize: vertical;
@@ -682,6 +826,42 @@ body.modo-lamina .aviso-demo {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+.ferramenta.destaque {
+  background: #7a5cff;
+  border-color: #7a5cff;
+}
+.passo-tour {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 3px solid #ec8fb6;
+  background: #2b2540;
+}
+.passo-tour p {
+  margin: 0;
+}
+.lista-tour {
+  margin: 16px 0 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 4px;
+}
+button.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--visor-suave);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+button.link:hover,
+button.link.atual {
+  color: var(--visor-texto);
+  text-decoration: underline;
 }
 .historico {
   display: grid;

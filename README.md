@@ -12,9 +12,9 @@ O plano completo (fases, arquitetura, custos e cuidados) está em
 | Pasta | Conteúdo |
 | --- | --- |
 | `ferramentas/` | Conversor da lâmina do Microview para Deep Zoom |
-| `site/` | Site de demonstração: início, catálogo e página da lâmina com quiz e anotações |
+| `site/` | O site: início, catálogo, página da lâmina (quiz, anotações, tour guiado) e a área do patologista (`#fichas`) |
 | `prototipo/` | Primeiro visualizador de teste (substituído pelo `site/`) |
-| `paginas/` | Aplicativo das fichas dos casos e página de envio das lâminas (artefatos do Claude) |
+| `paginas/` | Página avulsa de envio das lâminas (artefato do Claude) |
 | `tests/` | Testes automáticos |
 | `docs/` | Plano e decisões do projeto |
 | `amostras/`, `site/laminas/` | Lâminas convertidas para teste local (fora do Git) |
@@ -52,6 +52,17 @@ Abra <http://localhost:8000/>. O catálogo vem do aplicativo "Fichas das
 lâminas" (`ferramentas/casos_do_app.py pasta_das_fichas site/dados/casos.json`)
 ou, no formato antigo, da planilha exportada em CSV (`casos_da_planilha.py`).
 Só entram os casos marcados como prontos (use `--todos` para ver todos).
+
+## Publicar como artefato do Claude
+
+O site também roda como artefato do Claude, com o banco de dados das fichas.
+Para isso, CSS e JavaScript precisam ir embutidos numa página só:
+
+```bash
+python ferramentas/montar_artefato.py site saida --endereco https://claude.ai/artifact/<id>
+```
+
+O comando imprime a lista de arquivos (dados e lâminas) que acompanham a página.
 
 ## Ver o protótipo antigo
 

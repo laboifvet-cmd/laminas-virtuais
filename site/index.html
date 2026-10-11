@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-endereco="">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -12,6 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,650&family=Public+Sans:wght@400;500;600;700&display=swap"
     />
     <link rel="stylesheet" href="estilo.css" />
+    <link rel="stylesheet" href="fichas.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
   </head>
   <body>
@@ -24,6 +25,7 @@
       <nav class="menu">
         <a href="#laminas" data-rota="laminas">Lâminas</a>
         <a href="#planos" data-rota="planos">Planos</a>
+        <a href="#fichas" data-rota="fichas">Fichas</a>
         <button class="botao botao-contorno" id="entrar" type="button" title="O cadastro entra na próxima etapa">Entrar</button>
       </nav>
     </header>
@@ -32,6 +34,10 @@
       <span>IFVET · Patologia Diagnóstica</span>
       <span>Material de estudo. Casos sem identificação de animal, tutor ou clínica.</span>
     </footer>
+    <script src="comum.js"></script>
+    <script src="visor.js"></script>
+    <script src="aluno.js"></script>
+    <script src="fichas.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

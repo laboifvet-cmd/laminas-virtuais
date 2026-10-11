@@ -1,0 +1,535 @@
+/* Área do patologista: lista de casos à esquerda; à direita a ficha em blocos e, nas telas largas, a lâmina
+   ao lado, sempre visível, para marcar áreas e pontos do tour enquanto se escreve. */
+.fx {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  font-size: 15px;
+}
+.fx h1,
+.fx h2,
+.fx h3 {
+  font-family: var(--fonte-titulo);
+  font-weight: 650;
+}
+.fx p {
+  margin: 0;
+}
+.fx input[type='text'],
+.fx textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--linha);
+  background: var(--superficie-2);
+  color: var(--texto);
+  font: inherit;
+}
+.fx input[type='text']:focus,
+.fx textarea:focus {
+  border-color: var(--hematoxilina);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--hematoxilina-suave);
+}
+.fx textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+/* ---------- Lista ---------- */
+.fx-caixa {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 18px 14px;
+  border-right: 1px solid var(--linha);
+  background: var(--superficie);
+  min-height: 0;
+}
+.fx-caixa h1 {
+  font-size: 24px;
+}
+.fx-sub {
+  color: var(--suave);
+  font-size: 13px;
+}
+.fx-lado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.fx-busca {
+  flex: 1;
+  min-width: 0;
+}
+.fx-lista {
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  margin: 0 -6px;
+  padding: 2px 6px;
+}
+.fx-item {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--texto);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.fx-item:hover {
+  background: var(--superficie-2);
+}
+.fx-item[aria-current='true'] {
+  background: var(--hematoxilina-suave);
+  border-color: var(--hematoxilina);
+}
+.fx-mini {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  border: 1px solid var(--linha);
+  background: repeating-linear-gradient(45deg, var(--superficie-2), var(--superficie-2) 4px, var(--linha) 4px, var(--linha) 5px);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #fff;
+}
+.fx-item-texto {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.fx-item-texto strong,
+.fx-codigo {
+  font-family: var(--fonte-dado);
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+.fx-item-texto span {
+  color: var(--suave);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fx-selo,
+.fx-item-texto .fx-selo {
+  justify-self: start;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.fx-selo.rascunho {
+  background: var(--superficie-2);
+  color: var(--suave);
+  border: 1px solid var(--linha);
+}
+.fx-selo.revisao {
+  background: var(--atencao-suave);
+  color: var(--atencao);
+}
+.fx-selo.pronta {
+  background: var(--certo-suave);
+  color: var(--certo);
+}
+
+/* ---------- Botões ---------- */
+.fx-botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--hematoxilina);
+  background: var(--hematoxilina);
+  color: var(--superficie);
+  font: 600 15px var(--fonte-texto);
+  cursor: pointer;
+}
+.fx-botao.pequeno {
+  padding: 5px 12px;
+  font-size: 13px;
+}
+.fx-botao.discreto {
+  border-color: var(--linha);
+  background: var(--superficie);
+  color: var(--texto);
+}
+.fx-botao.perigo {
+  border-color: var(--errado);
+  background: transparent;
+  color: var(--errado);
+}
+.fx-icone {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid var(--linha);
+  background: var(--superficie);
+  color: var(--suave);
+  font: 15px var(--fonte-texto);
+  cursor: pointer;
+}
+.fx-icone:hover {
+  color: var(--hematoxilina);
+  border-color: var(--hematoxilina);
+}
+.fx-adicionar {
+  justify-self: start;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px dashed var(--linha);
+  background: none;
+  color: var(--hematoxilina);
+  font: 600 13px var(--fonte-texto);
+  cursor: pointer;
+}
+.fx-adicionar:hover:not(:disabled) {
+  border-color: var(--hematoxilina);
+}
+.fx-adicionar:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---------- Ficha ---------- */
+.fx-ficha {
+  min-height: 0;
+  overflow: hidden;
+}
+.fx-miolo {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 44%);
+}
+.fx-formulario {
+  overflow: auto;
+  min-height: 0;
+  padding: 22px 20px 64px;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+.fx-visor-area {
+  border-left: 1px solid var(--linha);
+}
+.fx-sem-lamina {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  padding: 24px;
+  background: var(--superficie-2);
+  color: var(--suave);
+  text-align: center;
+}
+.fx-sem-lamina strong {
+  color: var(--texto);
+  font-size: 18px;
+}
+.fx-envio {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  margin-top: 8px;
+  padding: 22px 16px;
+  border: 2px dashed var(--linha);
+  border-radius: 12px;
+  background: var(--superficie);
+  cursor: pointer;
+}
+.fx-envio.sobre,
+.fx-envio:hover {
+  border-color: var(--hematoxilina);
+  background: var(--hematoxilina-suave);
+}
+.fx-barra {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--linha);
+  overflow: hidden;
+}
+.fx-barra div {
+  height: 100%;
+  background: var(--hematoxilina);
+}
+.fx-cabeca-texto {
+  display: grid;
+  gap: 6px;
+}
+.fx-codigo {
+  color: var(--hematoxilina);
+}
+.fx-cabeca-texto h2 {
+  font-size: 28px;
+  line-height: 1.15;
+  margin: 0;
+}
+.fx-linha-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+  color: var(--suave);
+  font-size: 13px;
+}
+.fx-voltar {
+  display: none;
+  justify-self: start;
+}
+.fx-falta {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--atencao-suave);
+  color: var(--atencao);
+  font-size: 13px;
+}
+.fx-falta.ok {
+  background: var(--certo-suave);
+  color: var(--certo);
+}
+.fx-bloco {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--superficie);
+  border: 1px solid var(--linha);
+}
+.fx-bloco > header {
+  display: grid;
+  gap: 2px;
+}
+.fx-bloco h3 {
+  font-size: 21px;
+  margin: 0;
+}
+.fx-bloco > header p {
+  color: var(--suave);
+  font-size: 13px;
+}
+.fx-grade2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.fx-grade3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.fx-campo {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.fx-campo > label,
+.fx-rotulo {
+  font-size: 13px;
+  font-weight: 600;
+}
+.fx-campo small,
+small.fx-campo {
+  color: var(--suave);
+  font-size: 12px;
+}
+.fx-sugestoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.fx-chip {
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--linha);
+  background: var(--superficie);
+  color: var(--texto);
+  font: 13px var(--fonte-texto);
+  cursor: pointer;
+}
+.fx-chip:hover {
+  border-color: var(--hematoxilina);
+}
+.fx-chip[aria-pressed='true'] {
+  background: var(--hematoxilina);
+  border-color: var(--hematoxilina);
+  color: var(--superficie);
+}
+.fx-segmentos {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-self: start;
+  max-width: 100%;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.fx-segmentos button {
+  padding: 8px 14px;
+  border: 0;
+  border-right: 1px solid var(--linha);
+  background: var(--superficie);
+  color: var(--texto);
+  font: 14px var(--fonte-texto);
+  cursor: pointer;
+}
+.fx-segmentos button:last-child {
+  border-right: 0;
+}
+.fx-segmentos button[aria-pressed='true'] {
+  background: var(--hematoxilina);
+  color: var(--superficie);
+}
+.fx-linhas {
+  display: grid;
+  gap: 8px;
+}
+.fx-linha-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.fx-marca {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--eosina-suave);
+  color: var(--eosina);
+  display: grid;
+  place-items: center;
+  font: 700 12px var(--fonte-texto);
+}
+.fx-marca.errada {
+  background: var(--superficie-2);
+  color: var(--suave);
+  border: 1px solid var(--linha);
+}
+.fx-marca.certa {
+  background: var(--certo-suave);
+  color: var(--certo);
+}
+.fx-marca.tour {
+  width: 30px;
+  height: 30px;
+  background: #ec8fb6;
+  color: #1b1922;
+  cursor: pointer;
+}
+.fx-pergunta {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--superficie-2);
+  border: 1px solid var(--linha);
+}
+.fx-pergunta-topo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.fx-pergunta-topo strong {
+  font-family: var(--fonte-titulo);
+  font-size: 18px;
+}
+.fx-passo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+.fx-passo-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 72px;
+}
+.fx-aviso {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--hematoxilina-suave);
+  font-size: 13px;
+}
+.fx-confirmar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+}
+.fx-vazio {
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  height: 100%;
+  padding: 24px;
+  text-align: center;
+  color: var(--suave);
+}
+.fx-vazio h2 {
+  color: var(--texto);
+  font-size: 28px;
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .fx-ficha {
+    overflow: auto;
+  }
+  .fx-miolo {
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+  .fx-formulario {
+    overflow: visible;
+    order: 2;
+  }
+  .fx-visor-area {
+    order: 1;
+    height: 52vh;
+    border-left: 0;
+    border-bottom: 1px solid var(--linha);
+  }
+}
+@media (max-width: 820px) {
+  .fx {
+    grid-template-columns: 1fr;
+  }
+  .fx.aberta .fx-caixa {
+    display: none;
+  }
+  .fx:not(.aberta) .fx-ficha {
+    display: none;
+  }
+  .fx-caixa {
+    border-right: 0;
+  }
+  .fx-voltar {
+    display: inline-flex;
+  }
+  .fx-grade2,
+  .fx-grade3 {
+    grid-template-columns: 1fr;
+  }
+  .fx-cabeca-texto h2 {
+    font-size: 24px;
+  }
+}

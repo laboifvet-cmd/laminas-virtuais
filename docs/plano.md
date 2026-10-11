@@ -15,6 +15,16 @@ Teoria e vídeos ficam para depois, se fizer sentido.
 - [x] Planilha "Fichas dos casos" no Google Drive e gerador do catálogo a partir dela (`ferramentas/casos_da_planilha.py`)
 - [x] Aplicativo "Fichas das lâminas", que substitui a planilha, e gerador do catálogo a partir dele (`paginas/fichas.html`, `ferramentas/casos_do_app.py`)
 - [x] Página de envio das lâminas grandes, em partes (`paginas/envio.html`)
+
+### Etapa 1 do estudo dos visualizadores (feita)
+
+- [x] Fichas dentro do site, com a lâmina ao lado; marcar como "Publicada" põe o caso no catálogo na hora
+- [x] Pergunta de clicar na lesão: o patologista desenha a área na lâmina, o aluno clica
+- [x] Tour guiado: o patologista guarda vistas em ordem (centro e aumento), o aluno segue depois do quiz
+- [x] Botões de aumento (2×, 4×, 10×, 20×, 40×) e aumento atual na tela, a partir da objetiva do escaneamento
+- [x] Brilho e contraste, tela cheia e link para uma vista exata
+- [x] Envio da lâmina direto na ficha do caso
+- [ ] Calibração de µm por pixel no Microview (liga a barra de escala; o campo já existe na ficha)
 - [ ] Converter 3 a 5 lâminas reais, preencher as fichas e mostrar ao colega patologista
 
 ### Fase 1: lançamento de teste (30 a 40 lâminas)

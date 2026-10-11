@@ -24,6 +24,18 @@ def limpar_lista(itens):
     return [str(i).strip() for i in itens or [] if str(i).strip()]
 
 
+def numero(valor):
+    try:
+        n = float(str(valor if valor is not None else "").replace(",", "."))
+    except ValueError:
+        return None
+    return n if n > 0 else None
+
+
+def numero_valido(valor):
+    return isinstance(valor, (int, float)) and not isinstance(valor, bool)
+
+
 def caso_para_site(doc):
     # O download pode trazer o documento puro ou envelopado em {"id", "data", "version"}.
     dados = doc.get("data", doc) if isinstance(doc.get("data"), dict) else doc
@@ -32,21 +44,36 @@ def caso_para_site(doc):
         caso[campo] = str(dados.get(campo) or "").strip()
     caso["diferenciais"] = limpar_lista(dados.get("diferenciais"))
     caso["achados"] = limpar_lista(dados.get("achados"))
+    caso["objetiva"] = numero(dados.get("objetiva"))
+    caso["umPorPixel"] = numero(dados.get("umPorPixel"))
+    # Mesma regra de fichaParaCaso em site/comum.js.
     caso["quiz"] = []
     for q in dados.get("quiz") or []:
         pergunta = str(q.get("pergunta") or "").strip()
         resposta = str(q.get("resposta") or "").strip()
-        if not pergunta or not resposta:
+        tipo = q.get("tipo") if q.get("tipo") in ("aberta", "regiao") else "multipla"
+        if not pergunta:
             continue
-        aberta = q.get("tipo") == "aberta"
-        caso["quiz"].append(
-            {
-                "pergunta": pergunta,
-                "resposta": resposta,
-                "alternativas": [] if aberta else limpar_lista(q.get("alternativas")),
-                "explicacao": str(q.get("explicacao") or "").strip(),
-            }
-        )
+        item = {"tipo": tipo, "pergunta": pergunta, "resposta": resposta, "alternativas": [], "explicacao": str(q.get("explicacao") or "").strip()}
+        if tipo == "regiao":
+            r = q.get("regiao") or {}
+            if not all(numero_valido(r.get(k)) for k in "xywh") or r["w"] <= 0 or r["h"] <= 0:
+                continue
+            item["regiao"] = {k: r[k] for k in "xywh"}
+        else:
+            if not resposta:
+                continue
+            if tipo == "multipla":
+                item["alternativas"] = limpar_lista(q.get("alternativas"))
+                if not item["alternativas"]:
+                    item["tipo"] = "aberta"
+        caso["quiz"].append(item)
+    # Cada ponto do tour guarda o centro e o aumento (zoom); a largura da vista fica como reserva.
+    caso["tour"] = [
+        {"x": p["x"], "y": p["y"], "zoom": p.get("zoom") or 0, "largura": p.get("largura") or 0, "texto": str(p.get("texto") or "").strip()}
+        for p in dados.get("tour") or []
+        if numero_valido(p.get("x")) and numero_valido(p.get("y")) and any(numero_valido(p.get(k)) and p[k] > 0 for k in ("zoom", "largura"))
+    ]
     return caso, dados.get("situacao", "rascunho")
 
 
