@@ -664,6 +664,11 @@ body.modo-fichas .aviso-demo {
   max-height: 70vh;
   margin-bottom: 8px;
 }
+/* !important porque o OpenSeadragon escreve display no estilo de cada marca. */
+.sem-marcas .marcador,
+.sem-marcas .area-marcada {
+  display: none !important;
+}
 .area-marcada {
   border: 2px dashed #ffcf33;
   background: #ffcf3322;

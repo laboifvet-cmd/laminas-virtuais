@@ -191,6 +191,7 @@ function telaLamina(app, caso, { vista, enderecoBase } = {}) {
     onclick: () => {
       pararResposta();
       anotando = !anotando;
+      if (anotando) visor?.esconderMarcas(false);
       botaoAnotar.setAttribute('aria-pressed', anotando);
       caixaVisor.classList.toggle('anotando', anotando);
       if (anotando) abrirAba('notas');
@@ -284,6 +285,7 @@ function telaLamina(app, caso, { vista, enderecoBase } = {}) {
     caixaVisor.classList.remove('respondendo');
   }
   function comecarResposta(i) {
+    visor?.esconderMarcas(false);
     anotando = false;
     botaoAnotar.setAttribute('aria-pressed', 'false');
     caixaVisor.classList.remove('anotando');
@@ -407,6 +409,7 @@ function telaLamina(app, caso, { vista, enderecoBase } = {}) {
 
   // ----- Tour guiado -----
   function irParaPasso(i) {
+    visor?.esconderMarcas(false);
     passoTour = i;
     if (visor) visor.irPara(caso.tour[i]);
     if (abaAtual === 'tour') {

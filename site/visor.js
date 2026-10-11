@@ -58,6 +58,10 @@ async function criarVisor(caixa, codigo, opcoes = {}) {
   const botao = (rotulo, titulo, acao, extra = {}) => el('button', { type: 'button', class: 'visor-botao', title: titulo, 'aria-label': titulo, text: rotulo, onclick: acao, ...extra });
   ferramentas.append(botao('Inteira', 'Ver a lâmina inteira', () => viewer.viewport.goHome()));
 
+  // Esconde as marcas (anotações, respostas, tour, fotos) para olhar a lâmina limpa; nada é apagado.
+  const botaoLimpar = botao('Limpar', 'Esconder as marcas sobre a lâmina', () => api.esconderMarcas(!caixa.classList.contains('sem-marcas')), { 'aria-pressed': 'false' });
+  ferramentas.append(botaoLimpar);
+
   // Aumentos como na objetiva do microscópio: 100% da imagem corresponde à objetiva usada no escaneamento.
   if (objetiva) {
     for (const a of AUMENTOS) {
@@ -184,6 +188,12 @@ async function criarVisor(caixa, codigo, opcoes = {}) {
     },
     remover(e) {
       if (e) viewer.removeOverlay(e);
+    },
+    esconderMarcas(esconder) {
+      caixa.classList.toggle('sem-marcas', esconder);
+      botaoLimpar.setAttribute('aria-pressed', esconder ? 'true' : 'false');
+      botaoLimpar.textContent = esconder ? 'Marcas' : 'Limpar';
+      botaoLimpar.title = botaoLimpar.ariaLabel = esconder ? 'Mostrar as marcas de novo' : 'Esconder as marcas sobre a lâmina';
     },
     destruir() {
       viewer.destroy();

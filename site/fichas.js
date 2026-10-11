@@ -537,6 +537,7 @@ function telaFichas(app, banco, codigoInicial) {
         disabled: !visor,
         onclick: () => {
           if (!visor) return;
+          visor.esconderMarcas(false);
           aberto.tour.push({ ...visor.vistaAtual(), texto: '' });
           desenharTour(aberto.tour.length - 1);
           desenharMarcasVisor();
@@ -562,6 +563,7 @@ function telaFichas(app, banco, codigoInicial) {
   }
 
   function comecarMarcacao(i) {
+    visor?.esconderMarcas(false);
     marcando = i;
     caixaVisor.classList.add('respondendo');
     faixaVisor.textContent = '';
