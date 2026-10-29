@@ -1,0 +1,31 @@
+# Avisa por pull request quando sai versão nova de uma dependência,
+# principalmente as que corrigem falhas de segurança.
+# Atualizações comuns vêm juntas num PR por semana (menos barulho);
+# correções de segurança chegam na hora, em PR próprio.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Fortaleza
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps"
+    groups:
+      dependencias:
+        patterns: ["*"]
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Fortaleza
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    groups:
+      acoes:
+        patterns: ["*"]
